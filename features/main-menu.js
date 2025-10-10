@@ -46,6 +46,7 @@ let handler = async (m, { conn, usedPrefix, command, __dirname, text }) => {
         if (!user) return;
 
         let name = `@${m.sender.split('@')[0]}`;
+        let botname = conn.user?.name || global.namebot || 'Default Bot Name';
         let level = user.level || 0;
         let role = user.role || 'Beginner';
         let exp = user.exp || 0;
@@ -94,7 +95,7 @@ let handler = async (m, { conn, usedPrefix, command, __dirname, text }) => {
         let replace = {
             '%': '%', p: usedPrefix, name, level, role, limit, prems,
             totalexp: exp, date, year, uptime, platform, mode, rtotalreg,
-            me: conn.user.name, version: _package.version,
+            me: botname, version: _package.version,
             cpuModel, totalMem, freeMem, serverArch, serverOS,
             readmore: readMore,
         };
