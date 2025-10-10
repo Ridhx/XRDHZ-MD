@@ -2,7 +2,7 @@
   Script ini tidak untuk diperjual-belikan atau gratis.
   Script masih dalam tahap pengembangan mungkin akan ada bug, error dan lain sebagainya.
 */
-
+import "../settings.js";
 import os from "os";
 import chalk from "chalk";
 import CFonts from "cfonts";
@@ -32,8 +32,8 @@ export async function headerLog() {
     console.log(chalk.bold.yellow(" • SCRIPT INFO"));
     console.log(chalk.gray("-".repeat(50)));
     console.log(chalk.white(` ➢ 🤖  Author : ${chalk.green.bold(author)}`));
-    console.log(chalk.white(` ➢ 👤  Github : ${chalk.blue("https://github.com")}`));
-    console.log(chalk.white(` ➢ ✅  Whatsapp : ${chalk.blue("https://wa.me/6285751561624")}`));
+    console.log(chalk.white(` ➢ 👤  Github : ${chalk.blue(global.lgh)}`));
+    console.log(chalk.white(` ➢ ✅  Whatsapp : ${chalk.blue(global.lwa)}`));
     console.log(chalk.white(` ➢ ⚙️  Baileys : v${dependencies.baileys.replace("^", "")}`));
     console.log(chalk.gray("━".repeat(50)));
     console.log(chalk.bold.blue(" • SERVER INFO"));
