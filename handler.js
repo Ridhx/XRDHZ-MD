@@ -72,6 +72,7 @@ export async function handler(chatUpdate) {
                     if (!("antilink" in chat)) chat.antilink = false;
                     if (!("antivirtex" in chat)) chat.antivirtex = false;
                     if (!("mute" in chat)) chat.mute = false;
+                    if (!("detect" in chat)) chat.detect = false;
                     if (!("sambutan" in chat)) chat.sambutan = true;
                     if (!("sWelcome" in chat)) chat.sWelcome = "";
                     if (!("sBye" in chat)) chat.sBye = "";
@@ -85,6 +86,7 @@ export async function handler(chatUpdate) {
                         antilink: false,
                         antivirtex: false,
                         mute: false,
+                        detect: false,
                         sambutan: true,
                         sWelcome: "",
                         sBye: "",
@@ -219,7 +221,7 @@ export async function handler(chatUpdate) {
                 if (!isAccept) continue;
                 m.feature = name;
 
-                if (isMuted && !isROwner) continue;
+                if (isMuted && (!isROwner || !isAdmin)) return;
 
                 if (feature.rowner && feature.owner && !(isROwner || isOwner)) {
                     global.dFail("owner", m, this);
@@ -323,7 +325,8 @@ export async function handler(chatUpdate) {
 }
 
 /**
- *
+ * Hadler Participants Update
+ * @param {import('baileys').BaileysEventMap<unknown>['group-participants.update']} groupsUpdate
  */
 export async function participantsUpdate({ id, participants, action }) {
     if (this.isHandlerInit) return;
@@ -338,7 +341,7 @@ export async function participantsUpdate({ id, participants, action }) {
                     const rawJid = (await conn.getJid(user)) || user;
                     message = (
                         action === "add"
-                            ? (chat.sWelcome || "Selamat Datang @user")
+                            ? (chat.sWelcome || conn.sWelcome || "Selamat Datang @user")
                                   .replace("@subject", await this.getName(id))
                                   .replace(
                                       "@desc",
@@ -346,7 +349,7 @@ export async function participantsUpdate({ id, participants, action }) {
                                           ? String.fromCharCode(8206).repeat(4001) + groupMetadata.desc
                                           : ""
                                   )
-                            : chat.sBye || "Selamat Tinggal @user"
+                            : chat.sBye || conn.sBye || "Selamat Tinggal @user"
                     ).replace("@user", "@" + rawJid.split("@")[0]);
 
                     await this.sendMessage(
@@ -367,8 +370,8 @@ export async function participantsUpdate({ id, participants, action }) {
             const rawJid = (await conn.getJid(participants[0])) || participants[0];
             message = (
                 action === "promote"
-                    ? chat.sPromote || "Selamat @user telah menjadi Admin"
-                    : chat.sDemote || "@user telah diberhentikan sebagai Admin"
+                    ? chat.sPromote || conn.sPromote || "Selamat @user telah menjadi Admin"
+                    : chat.sDemote || conn.sDemote || "@user telah diberhentikan sebagai Admin"
             ).replace("@user", "@" + rawJid.split("@")[0]);
 
             await this.sendMessage(
@@ -386,11 +389,30 @@ export async function participantsUpdate({ id, participants, action }) {
 }
 
 /**
- *
+ * Handler groups update
+ * @param {import('baileys').BaileysEventMap<unknown>['groups.update']} groupsUpdate
  */
 export async function groupsUpdate(groupsUpdate) {
     if (!groupsUpdate) return;
-    console.log(groupsUpdate);
+    for (const groupUpdate of groupsUpdate) {
+        const id = groupUpdate.id;
+        if (!id) continue;
+        let chat = global.db.data?.chats[id];
+
+        let text = "";
+        if (!chat?.detect) continue;
+        if (groupUpdate.desc) text = (conn.sDesc || "@desc").replace("@desc", groupUpdate.desc);
+        if (groupUpdate.subject)
+            text = (conn.sSubject || "@subject").replace("@subject", groupUpdate.subject);
+        if (groupUpdate.icon) text = conn.sIcon || "Icon group telah diganti";
+        if (groupUpdate.sRevoke) text = (conn.sRevoke || "@revoke").replace("@revoke", groupUpdate.revoke);
+
+        if (!text) continue;
+        await this.sendMessage(id, {
+            text,
+            mentions: this.parseMention(text)
+        });
+    }
 }
 
 /**
