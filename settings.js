@@ -10,18 +10,23 @@ import moment from "moment-timezone";
 
 // ===== CONFIG =====
 global.owner = ["6285751561624"];
-global.nomorbot = "6287825020012";
 global.nomorown = "6285751561624";
 
+global.nomorbot = "6287825020012";
+global.namabot = "XRDHZ-MD";
+
+// ===== THUMBNAIL =====
+global.thum = "https://qu.ax/NvoLP.jpg";
+
+// ===== OPTIONS =====
 global.autoRead = true; // OPSIONAL
 
-// ===== LINK =====
+// ===== LINK ====
 global.lgh = "https://github.com/Ridhx/XRDHZ-MD"; // Github
 global.lwa = "https://wa.me/6285751561624"; // Whatsapp
 global.lig = ""; // Instagram
 global.lgc = ""; // Group Chat Whatsapp
-global.lch = ""; // Channel Whatsapp
-
+global.lch = ""; // Channels Whatsapp 
 let file = fileURLToPath(import.meta.url);
 watchFile(file, async () => {
     unwatchFile(file);
