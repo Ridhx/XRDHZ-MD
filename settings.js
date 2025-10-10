@@ -8,11 +8,19 @@ import { watchFile, unwatchFile } from "fs";
 import { fileURLToPath } from "url";
 import moment from "moment-timezone";
 
+// ===== CONFIG =====
 global.owner = ["6285751561624"];
 global.nomorbot = "6287825020012";
 global.nomorown = "6285751561624";
 
 global.autoRead = true; // OPSIONAL
+
+// ===== LINK =====
+global.lgh = "https://github.com/Ridhx/XRDHZ-MD"; // Github
+global.lwa = "https://wa.me/6285751561624"; // Whatsapp
+global.lig = ""; // Instagram
+global.lgc = ""; // Group Chat Whatsapp
+global.lch = ""; // Channel Whatsapp
 
 let file = fileURLToPath(import.meta.url);
 watchFile(file, async () => {
