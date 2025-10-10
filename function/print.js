@@ -7,28 +7,53 @@ import { unwatchFile, watchFile, readFileSync } from "fs";
 export default async function (m, conn = { user: {} }) {
     if (m.fromMe) return;
     const _name = m.pushName ? m.pushName : await conn.getName(m.sender);
-    const _chat = await conn.getName(m.chat);
+    const _chat = m.chat.endsWith("@g.us") ? m.chat : "~Private Chat";
     const sender = await parsePhoneNumber("+" + m.sender.replace("@s.whatsapp.net", ""))?.number
         ?.international;
 
     let user = global.db.data?.users[m.sender];
-
-    let render = `${chalk.white(" » SENDER:")} ${chalk.white("%s")}\n`;
-    render += `${chalk.white(" » NAME :")} ${chalk.blue("%s")}\n`;
-    render += `${chalk.white(" » DATE:")} ${chalk.gray("%s")}\n`;
-    render += `${chalk.white(" » SEND TO:")} ${chalk.green("%s")}`;
+    let filesize =
+        (m.msg
+            ? m.msg.vcard
+                ? m.msg.vcard.length
+                : m.msg.fileLength
+                ? m.msg.fileLength.low || m.msg.fileLength
+                : m.msg.axolotlSenderKeyDistributionMessage
+                ? m.msg.axolotlSenderKeyDistributionMessage.length
+                : m.text
+                ? m.text.length
+                : 0
+            : m.text
+            ? m.text.length
+            : 0) || 0;
 
     console.log(chalk.gray("-".repeat(50)));
     console.log(
-        render,
+        `${chalk.white(" » BOT:")} ${chalk.black(chalk.bgBlue("%s"))}
+${chalk.white(" » SENDER:")} ${chalk.white("%s")}
+${chalk.white(" » NAME:")} ${chalk.blueBright("%s")}
+${chalk.white(" » DATE:")} ${chalk.gray("%s")}
+${chalk.white(" » SEND TO:")} ${chalk.green("%s")}
+${chalk.white(" » MTYPE:")} ${chalk.yellow("%s")} ${chalk.red("[%s %sB]")}`.trim(),
+        conn.user.name,
         sender,
         _name,
         (m.messageTimestamp
             ? new Date(1000 * (m.messageTimestamp.low || m.messageTimestamp))
             : new Date()
         ).toLocaleString("id", { timeZone: "Asia/Jakarta" }),
-        m.chat + (_chat ? "~" + _chat : "")
+        _chat,
+        m.mtype
+            ? m.mtype
+                  .replace(/message$/i, "")
+                  .replace("audio", m.msg.ptt ? "PTT" : "audio")
+                  .replace(/^./, v => v.toUpperCase())
+            : "",
+        filesize === 0 ? 0 : (filesize / 1009 ** Math.floor(Math.log(filesize) / Math.log(1000))).toFixed(1),
+        ["", ..."KMGTP"][Math.floor(Math.log(filesize) / Math.log(1000))] || ""
     );
+    if (typeof m.text === "string" && m.text) {
+    }
     console.log(chalk.gray("-".repeat(50)));
 }
 
