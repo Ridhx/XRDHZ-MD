@@ -1,8 +1,10 @@
-# XRDHZ-MD
+<h1 align="center">XRDHZ-MD</h1>
 
-Bot WhatsApp sederhana berbasis [Baileys](https://github.com/whiskeysockets/Baileys) dengan struktur modern menggunakan **ECMAScript Modules (ESM)**. Dirancang untuk menjadi ringan, mudah digunakan, dan dapat dikembangkan lebih lanjut sesuai kebutuhan.
+<p align="center">
+  <a href="https://github.com/Ridhx/XRDHZ-MD"><img title="Author" src="https://img.shields.io/badge/AUTHOR-RIDHX-green.svg?style=for-the-badge&logo=github"></a>
+</p>
 
-<div align="left">
+<div align="center">
   
   ![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)
   ![Baileys](https://img.shields.io/badge/Baileys-Latest-blue.svg)
@@ -10,9 +12,51 @@ Bot WhatsApp sederhana berbasis [Baileys](https://github.com/whiskeysockets/Bail
   
 </div>
 
+---
 
-## Syarat dan Ketentuan
-Sebelum memulai, pastikan Anda memiliki:
-- [Node.js](https://nodejs.org/) versi 20 atau lebih tinggi.
-- Akun WhatsApp aktif untuk menghubungkan bot.
-- Pengetahuan dasar JavaScript dan Node.js.
+Bot WhatsApp sederhana berbasis [Baileys](https://github.com/whiskeysockets/Baileys) dengan struktur modern menggunakan **ECMAScript Modules (ESM)**. Dirancang untuk menjadi ringan, mudah digunakan, dan dapat dikembangkan lebih lanjut sesuai kebutuhan.
+
+---
+
+## **📌 Note**
+- Edit semua info dan konfigurasi di file `settings.js`
+- Wajib menggunakan [node.js](https://nodejs.org) versi 20+
+- Script ini masih dalam tahap pengembangan dan belum rilis sepenuhnya.
+
+---
+
+## **ℹ️ Informasi Script**
+- ✅ | **Simple Code**
+- ❌ | **Support Button**
+- ✅ | **Multi-Device**
+- ✅ | **Tipe Plugin**
+
+---
+
+## **⚙️ Cara install**
+```javascript
+git clone https://github.com/Ridhx/XRDHZ-MD.git
+cd XRDHZ-MD
+npm install
+npm start
+```
+
+---
+
+## **👥 Kontributor**
+
+<div align="left">
+  <table>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/WhiskeySockets">
+          <img src="https://github.com/WhiskeySockets.png?size=100" width="100" style="border-radius:50%">
+          <br>
+          <strong>WhiskeySockets</strong>
+          <br>
+          <sub>Baileys</sub>
+        </a>
+      </td>
+    </tr>
+  </table>
+</div>
