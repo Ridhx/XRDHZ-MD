@@ -43,18 +43,25 @@ npm start
 
 ---
 
-## **👥 Kontributor**
+## **🫂 Thanks To**
 
 <div align="left">
   <table>
     <tr>
       <td align="center">
+        <a href="https://github.com/Ridhx">
+          <img src="https://github.com/Ridhx.png?size=50" width="50" style="border-radius:50%">
+          <br>
+          <strong>Ridhx</strong>
+          <br>
+        </a>
+      </td>
+      <td align="center">
         <a href="https://github.com/WhiskeySockets">
-          <img src="https://github.com/WhiskeySockets.png?size=100" width="100" style="border-radius:50%">
+          <img src="https://github.com/WhiskeySockets.png?size=50" width="50" style="border-radius:50%">
           <br>
           <strong>WhiskeySockets</strong>
           <br>
-          <sub>Baileys</sub>
         </a>
       </td>
     </tr>
