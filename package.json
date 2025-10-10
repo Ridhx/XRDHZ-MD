@@ -1,0 +1,41 @@
+{
+    "name": "xrdhz-md",
+    "version": "1.0.0",
+    "description": "Simple Free Whatsapp Bot Script Tipe ESM.",
+    "main": "main.js",
+    "directories": {
+        "features": "features",
+        "function": "function",
+        "src": "src"
+    },
+    "scripts": {
+        "start": "node start.js"
+    },
+    "keywords": ["whatsapp", "bot", "esm", "baileys"],
+    "author": "Ridevx",
+    "license": "MIT",
+    "type": "module",
+    "dependencies": {
+        "@hapi/boom": "^10.0.1",
+        "awesome-phonenumber": "^7.5.0",
+        "baileys": "^7.0.0-rc.5",
+        "cfonts": "^3.3.1",
+        "chalk": "^5.6.2",
+        "child_process": "^1.0.2",
+        "cluster": "^0.7.7",
+        "file-type": "^21.0.0",
+        "jimp": "^1.6.0",
+        "lodash": "^4.17.21",
+        "lowdb": "^2.1.0",
+        "moment-timezone": "^0.6.0",
+        "node-fetch": "^3.3.2",
+        "os": "^0.1.2",
+        "path": "^0.12.7",
+        "process": "^0.11.10",
+        "readline": "^1.3.0",
+        "syntax-error": "^1.4.0",
+        "url": "^0.11.4",
+        "util": "^0.12.5",
+        "yargs": "18.0.0"
+    }
+}
