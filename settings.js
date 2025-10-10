@@ -1,0 +1,22 @@
+/* XRDHZ-MD
+  Script ini tidak untuk diperjual-belikan atau gratis.
+  Script masih dalam tahap pengembangan mungkin akan ada bug, error dan lain sebagainya.
+*/
+
+import chalk from "chalk";
+import { watchFile, unwatchFile } from "fs";
+import { fileURLToPath } from "url";
+import moment from "moment-timezone";
+
+global.owner = ["6285751561624"];
+global.nomorbot = "6287825020012";
+global.nomorown = "6285751561624";
+
+global.autoRead = true; // OPSIONAL
+
+let file = fileURLToPath(import.meta.url);
+watchFile(file, async () => {
+    unwatchFile(file);
+    console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.green.bold(`FILE DIUPDATE "settings.js"`)}`);
+    import(`${file}?update=${Date.now()}`);
+});
