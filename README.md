@@ -55,14 +55,6 @@ npm start
   <table>
     <tr>
       <td align="center">
-        <a href="https://github.com/Ridhx">
-          <ig src="https://github.com/Ridhx.png?size=50" width="50" style="border-radius:50%">
-          <br>
-          <strong>Ridhx</strong>
-          <br>
-        </a>
-      </td>
-      <td align="center">
         <a href="https://github.com/WhiskeySockets">
           <img src="https://github.com/WhiskeySockets.png?size=50" width="50" style="border-radius:50%">
           <br>
