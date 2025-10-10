@@ -15,7 +15,7 @@ import syntaxerror from "syntax-error";
 import { format } from "util";
 import { fileURLToPath, pathToFileURL } from "url";
 
-import { readdirSync, statSync, unlinkSync, existsSync, readFileSync, watch } from "fs";
+import { readdirSync, statSync, unlinkSync, existsSync, readFileSync, mkdirSync, watch } from "fs";
 import { spawn } from "child_process";
 import { createRequire } from "module";
 
@@ -76,9 +76,14 @@ const connectionOptions = {
     markOnlineOnConnect: true
 };
 
-global.prefix = ".";
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
 global.conn = await makeWASocket(connectionOptions, global.opts);
+
+global.prefix = new RegExp(
+    "^[" +
+        (opts.prefix || "‎xzXZ/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.\\-").replace(/[|\\{}()[\]^$+*?.\-\^]/g, "\\$&") +
+        "]"
+);
 
 // DATABASE
 global.db = new Low(new JSONFile("database.json"));
@@ -110,6 +115,33 @@ global.loadDatabase = async function loadDatabase() {
 if (global.db) {
     setInterval(async () => {
         if (global.db.data) await global.db.write();
+    }, 30 * 1000);
+}
+
+const tmpFolder = join(process.cwd(), "tmp");
+if (!existsSync(tmpFolder)) {
+    mkdirSync(tmpFolder, { recursive: true });
+}
+// Auto Clear TMP Folder
+if (existsSync(tmpFolder)) {
+    setInterval(() => {
+        if (existsSync(tmpFolder)) {
+            const files = readdirSync(tmpFolder);
+            const now = Date.now();
+            const limit = 2 * 60 * 1000; // 2 MENIT
+
+            for (const file of files) {
+                const filePath = join(tmpFolder, file);
+                try {
+                    const stats = statSync(filePath);
+                    if (now - stats.mtimeMs >= limit) {
+                        unlinkSync(filePath);
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+        }
     }, 30 * 1000);
 }
 
