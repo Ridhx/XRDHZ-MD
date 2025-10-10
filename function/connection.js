@@ -64,29 +64,34 @@ export async function requestPairing(conn) {
  */
 export async function connectionUpdate(update, conn) {
     const { receivedPendingNotifications, connection, lastDisconnnect, isOnline, isNewLogin } = update;
-    if (isNewLogin) {
-        await headerLog();
-    }
-    if (connection === "open") {
-        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.green.bold(`TERHUBUNG ✅`)}`);
-    }
-    if (receivedPendingNotifications) {
-        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellowBright.bold(`MENUNGGU PESAN MASUK 📥`)}`);
-    }
-    if (connection === "close") {
-        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.red.bold(`GAGAL TERHUBUNG ❌`)}`);
-        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`MENGHUBUNGKAN KEMBALI 🌐`)}`);
-        await global.reloadHandler(true);
-    }
-    if (
-        lastDisconnnect &&
-        lastDisconnnect.error &&
-        lastDisconnnect.error.output &&
-        lastDisconnnect.error.output.statusCode !== DisconnectReason.loggedOut
-    ) {
-        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`MENGHUBUNGKAN KEMBALI 🌐`)}`);
-        await global.reloadHandler(true);
-    }
+    try {
+        if (isNewLogin) await headerLog();
+    } catch (e) {
+        console.log(e);
+    } finally {
+        if (connection === "open")
+            console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.green.bold(`TERHUBUNG ✅`)}`);
 
-    return false;
+        if (connection === "close") {
+            console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.red.bold(`GAGAL TERHUBUNG ❌`)}`);
+            await global.reloadHandler(true);
+            console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`MENGHUBUNGKAN KEMBALI 🌐`)}`);
+        }
+        if (receivedPendingNotifications)
+            console.log(
+                `${chalk.white.bold(" [SISTEM]")} ${chalk.yellowBright.bold(`MENUNGGU PESAN MASUK 📥`)}`
+            );
+
+        if (
+            lastDisconnnect &&
+            lastDisconnnect.error &&
+            lastDisconnnect.error.output &&
+            lastDisconnnect.error.output.statusCode !== DisconnectReason.loggedOut
+        ) {
+            console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`MENGHUBUNGKAN KEMBALI 🌐`)}`);
+            await global.reloadHandler(true);
+        }
+
+        return false;
+    }
 }
