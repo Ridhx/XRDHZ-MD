@@ -18,7 +18,7 @@ Bot WhatsApp sederhana berbasis [Baileys](https://github.com/whiskeysockets/Bail
 
 ---
 
-#### **📌 Catatan**
+### **📌 Catatan**
 
 -   Edit semua info dan konfigurasi di file `settings.js`
 -   Wajib menggunakan [node.js](https://nodejs.org) versi 20+
@@ -27,7 +27,7 @@ Bot WhatsApp sederhana berbasis [Baileys](https://github.com/whiskeysockets/Bail
 
 ---
 
-#### **ℹ️ Informasi Script**
+### **ℹ️ Informasi Script**
 
 -   ✅ | **Simple Code**
 -   ✅ | **Pairing With Code**
@@ -38,7 +38,7 @@ Bot WhatsApp sederhana berbasis [Baileys](https://github.com/whiskeysockets/Bail
 
 ---
 
-#### **⚙️ Cara Pakai**
+### **⚙️ Cara Pakai**
 
 ```javascript
 git clone https://github.com/Ridhx/XRDHZ-MD.git
@@ -49,7 +49,7 @@ npm start
 
 ---
 
-## **🫂 Terima Kasih**
+### **🫂 Terima Kasih**
 
 <div align="left">
   <table>
