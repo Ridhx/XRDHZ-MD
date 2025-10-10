@@ -1,7 +1,7 @@
 <h1 align="center">XRDHZ-MD</h1>
 
 <p align="center">
-  <a href="https://github.com/Ridhx/XRDHZ-MD"><img title="Author" src="https://img.shields.io/badge/AUTHOR-RIDHX-green.svg?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/Ridhx/XRDHZ-MD"><img title="Author" src="https://img.shields.io/badge/AUTHOR-Ridhx-green.svg?style=for-the-badge&logo=github"></a>
 </p>
 
 <div align="center">
@@ -18,39 +18,45 @@ Bot WhatsApp sederhana berbasis [Baileys](https://github.com/whiskeysockets/Bail
 
 ---
 
-## **📌 Note**
-- Edit semua info dan konfigurasi di file `settings.js`
-- Wajib menggunakan [node.js](https://nodejs.org) versi 20+
-- Script ini masih dalam tahap pengembangan dan belum rilis sepenuhnya.
+## **📌 Catatan**
+
+-   Edit semua info dan konfigurasi di file `settings.js`
+-   Wajib menggunakan [node.js](https://nodejs.org) versi 20+
+-   Diperlukan basic Javascript dan NodeJS
+-   Script ini masih dalam tahap pengembangan dan belum rilis sepenuhnya.
 
 ---
 
 ## **ℹ️ Informasi Script**
-- ✅ | **Simple Code**
-- ❌ | **Support Button**
-- ✅ | **Multi-Device**
-- ✅ | **Tipe Plugin**
+
+-   ✅ | **Simple Code**
+-   ✅ | **Pairing With Code**
+-   ✅ | **Multi-Devices**
+-   ✅ | **Plugin Features**
+-   ✅ | **ECMAScript Modules**
+-   ❌ | **Support Button**
 
 ---
 
-## **⚙️ Cara install**
+## **⚙️ Cara Pakai**
+
 ```javascript
 git clone https://github.com/Ridhx/XRDHZ-MD.git
-cd XRDHZ-MD
+cd xrdhz-md
 npm install
 npm start
 ```
 
 ---
 
-## **🫂 Thanks To**
+## **🫂 Terima Kasih**
 
 <div align="left">
   <table>
     <tr>
       <td align="center">
         <a href="https://github.com/Ridhx">
-          <img src="https://github.com/Ridhx.png?size=50" width="50" style="border-radius:50%">
+          <ig src="https://github.com/Ridhx.png?size=50" width="50" style="border-radius:50%">
           <br>
           <strong>Ridhx</strong>
           <br>
@@ -64,6 +70,18 @@ npm start
           <br>
         </a>
       </td>
+      <td align="center">
+        <a href="https://github.com/XM4ZE">
+          <img src="https://github.com/XM4ZE.png?size=50" width="50" style="border-radius:50%">
+          <br>
+          <strong>XM4ZE</strong>
+          <br>
+        </a>
+      </td>
     </tr>
   </table>
 </div>
+
+---
+
+#### **Jangan Lupa Untuk Kasih Bintang Ya 🌟**
