@@ -31,18 +31,17 @@ export async function headerLog() {
     console.log(chalk.bold.white("━".repeat(50)));
     console.log(chalk.bold.yellow(" • SCRIPT INFO"));
     console.log(chalk.gray("-".repeat(50)));
-    console.log(chalk.white(` ➢ 🤖  Author : ${chalk.green.bold(author)}`));
-    console.log(chalk.white(` ➢ 👤  Github : ${chalk.blue(global.lgh)}`));
-    console.log(chalk.white(` ➢ ✅  Whatsapp : ${chalk.blue(global.lwa)}`));
-    console.log(chalk.white(` ➢ ⚙️  Baileys : v${dependencies.baileys.replace("^", "")}`));
+    console.log(chalk.white(` ➢ 🤖  Author: ${chalk.green.bold(author)}`));
+    console.log(chalk.white(` ➢ 👤  Github: ${chalk.blue(global.lgh)}`));
+    console.log(chalk.white(` ➢ ✅  Whatsapp: ${chalk.blue(global.lwa)}`));
+    console.log(chalk.white(` ➢ ⚙️  Baileys: ${chalk.cyan(dependencies.baileys.replace("^", "v"))}`));
     console.log(chalk.gray("━".repeat(50)));
     console.log(chalk.bold.blue(" • SERVER INFO"));
     console.log(chalk.gray("-".repeat(50)));
-    console.log(chalk.white(` ➢ 🖥  Platform : ${chalk.green(os.platform())}`));
-    console.log(chalk.white(` ➢ 🖥  CPU Model : ${chalk.blue(os.cpus()[0].model)}`));
-    console.log(chalk.white(` ➢ 🖥  CPU Speed : ${os.cpus()[0].speed} MHz`));
-    console.log(chalk.white(` ➢ 🖥  Total Memory : ${Math.round(os.totalmem() / 1024 / 1024)} MB`));
-    console.log(chalk.white(` ➢ 🖥  Free Memory : ${Math.round(os.freemem() / 1024 / 1024)} MB`));
+    console.log(chalk.white(` ➢ 🖥  Platform: ${chalk.green(os.platform())}`));
+    console.log(chalk.white(` ➢ 🖥  CPU Model: ${chalk.blue(os.cpus()[0].model)}`));
+    console.log(chalk.white(` ➢ 🖥  Total Memori: ${Math.round(os.totalmem() / 1024 / 1024)} MB`));
+    console.log(chalk.white(` ➢ 🖥  Free Memori: ${Math.round(os.freemem() / 1024 / 1024)} MB`));
     console.log(chalk.gray("━".repeat(50)));
     console.log(chalk.bold.green(" • QUICK TEST"));
     console.log(chalk.gray("-".repeat(50)));
@@ -50,9 +49,9 @@ export async function headerLog() {
         const ffmpegCheck = s.ffmpeg && s.ffmpegWebp;
         const magickCheck = s.convert || s.magick || s.gm;
         const ffmpegStatus = ffmpegCheck ? "✅" : "❌";
-        console.log(` ➢ 📂  ${chalk.red("FFMPEG")} : ${ffmpegStatus}`);
+        console.log(` ➢ 📂  ${chalk.red("FFMPEG")}: ${ffmpegStatus}`);
         const magickStatus = magickCheck ? "✅" : "❌";
-        console.log(` ➢ 📂  ${chalk.red("MAGICK")} : ${magickStatus}`);
+        console.log(` ➢ 📂  ${chalk.red("MAGICK")}: ${magickStatus}`);
         if (!ffmpegCheck || !magickCheck) {
             console.log(chalk.gray("-".repeat(50)));
             if (!s.ffmpeg) console.log(chalk.yellow("-- ffmpeg belum terinstall (pkg install ffmpeg)"));
