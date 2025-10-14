@@ -41,11 +41,10 @@ global.__dirname = function dirname(pathURL) {
     return path.dirname(global.__filename(pathURL, true));
 };
 const __dirname = global.__dirname(import.meta.url);
-const { version } = await fetchLatestBaileysVersion();
 const { state, saveCreds } = await useMultiFileAuthState("./sessions");
 
 const connectionOptions = {
-    version,
+    version: [2, 3000, 1025190524], // OPSIONAL
     printQRInTerminal: false,
     logger: pino({ level: "silent" }),
     browser: Browsers.ubuntu("Chrome"),
