@@ -74,11 +74,11 @@ export async function handler(chatUpdate) {
                     if (!("mute" in chat)) chat.mute = false;
                     if (!("detect" in chat)) chat.detect = false;
                     if (!("sambutan" in chat)) chat.sambutan = true;
+                    if (!("sewa" in chat)) chat.sewa = false;
                     if (!("sWelcome" in chat)) chat.sWelcome = "";
                     if (!("sBye" in chat)) chat.sBye = "";
                     if (!("sPromote" in chat)) chat.sPromote = "";
                     if (!("sDemote" in chat)) chat.sDemote = "";
-                    if (!("sewa" in chat)) chat.sewa = false;
                     if (!isNumber(chat.sewaDate)) chat.sewaDate = -1;
                 } else
                     global.db.data.chats[m.chat] = {
@@ -88,11 +88,11 @@ export async function handler(chatUpdate) {
                         mute: false,
                         detect: false,
                         sambutan: true,
+                        sewa: false,
                         sWelcome: "",
                         sBye: "",
                         sPromote: "",
                         sDemote: "",
-                        sewa: false,
                         sewaDate: -1
                     };
             }
@@ -384,6 +384,7 @@ export async function participantsUpdate({ id, participants, action }) {
                 },
                 { quoted: null }
             );
+
             break;
     }
 }
@@ -396,21 +397,33 @@ export async function groupsUpdate(groupsUpdate) {
     if (!groupsUpdate) return;
     for (const groupUpdate of groupsUpdate) {
         const id = groupUpdate.id;
-        if (!id) continue;
-        let chat = global.db.data?.chats[id];
+        const user = await conn.getJid(groupUpdate.author);
+        if (!id || !user) continue;
 
-        let text = "";
+        let text;
+        let chat = global.db.data?.chats[id];
         if (!chat?.detect) continue;
-        if (groupUpdate.desc) text = (conn.sDesc || "@desc").replace("@desc", groupUpdate.desc);
+
+        if (groupUpdate.desc)
+            text = (chat?.sDesc || "Deskripsi group diganti oleh @user\n\n@desc")
+                .replace("@user", `@${user.split("@")[0]}`)
+                .replace("@desc", groupUpdate.desc);
         if (groupUpdate.subject)
-            text = (conn.sSubject || "@subject").replace("@subject", groupUpdate.subject);
-        if (groupUpdate.icon) text = conn.sIcon || "Icon group telah diganti";
-        if (groupUpdate.sRevoke) text = (conn.sRevoke || "@revoke").replace("@revoke", groupUpdate.revoke);
+            text = (chat?.sSubject || "Judul group diganti oleh @user\n\n@subject")
+                .replace("@user", `@${user.split("@")[0]}`)
+                .replace("@subject", groupUpdate.subject);
+        if (groupUpdate.icon)
+            text = (chat?.sIcon || "Ikon group diganti oleh @user").replace(
+                "@user",
+                `@${user.split("@")[0]}`
+            );
+        if (groupUpdate.inviteCode)
+            text = "Link group diganti oleh @user".replace("@user", `@${user.split("@")[0]}`);
 
         if (!text) continue;
         await this.sendMessage(id, {
             text,
-            mentions: this.parseMention(text)
+            mentions: [user]
         });
     }
 }

@@ -203,11 +203,9 @@ global.reloadHandler = async function reloadHandler(restartConnection) {
 
     conn.sWelcome = "Selamat Datang @user";
     conn.sBye = "Selamat Tinggal @user";
-    conn.sSubject = "Nama Group Telah Diubah\n\n@subject";
-    conn.sDesc = "Deskripsi Telah Diubah\n\n@desc";
-    conn.sIcon = "Icon Group Telah Diganti";
-    conn.sRevoke = "Link Invite Telah Direvoke";
-    conn.sPromote = "Selamat @user Telah Menjadi Admin";
+    conn.sSubject = "@subject";
+    conn.sDesc = "@desc";
+    conn.sPromote = "Selamat @user telah menjadi Admin";
     conn.sDemote = "@user telah diberhentikan sebagai Admin";
 
     conn.handler = HandlerModule.handler.bind(global.conn);
