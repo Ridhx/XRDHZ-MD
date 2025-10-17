@@ -39,9 +39,11 @@ export async function headerLog() {
     console.log(chalk.bold.blue(" • SERVER INFO"));
     console.log(chalk.gray("-".repeat(50)));
     console.log(chalk.white(` ➢ 🖥  Platform: ${chalk.green(os.platform())}`));
-    console.log(chalk.white(` ➢ 🖥  CPU Model: ${chalk.blue(os.cpus()[0].model)}`));
-    console.log(chalk.white(` ➢ 🖥  Total Memori: ${Math.round(os.totalmem() / 1024 / 1024)} MB`));
-    console.log(chalk.white(` ➢ 🖥  Free Memori: ${Math.round(os.freemem() / 1024 / 1024)} MB`));
+    console.log(
+        chalk.white(` ➢ 🖥  CPU Model: ${chalk.blue(os.cpus() ? os.cpus()[0].model.trim() : "N/A")}`)
+    );
+    console.log(chalk.white(` ➢ 🖥  Total Memori: ${formatBytes(os.totalmem())}`));
+    console.log(chalk.white(` ➢ 🖥  Free Memori: ${formatBytes(os.freemem())}`));
     console.log(chalk.gray("━".repeat(50)));
     console.log(chalk.bold.green(" • QUICK TEST"));
     console.log(chalk.gray("-".repeat(50)));
@@ -102,3 +104,12 @@ const quickTest = async function quickTest() {
 
     return support;
 };
+
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+}
