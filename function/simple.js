@@ -60,7 +60,7 @@ export function makeWASocket(connectionOptions, options = {}) {
         getJid: {
             value(sender) {
                 if (!conn.storeLid) conn.storeLid = {};
-                if (!sender.endsWith("@lid") || sender.endsWith("@s.whatsapp.net")) return sender;
+                if (!sender?.endsWith("@lid") || sender?.endsWith("@s.whatsapp.net")) return sender;
                 if (conn.storeLid[sender]) return conn.storeLid[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
@@ -675,7 +675,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                 );
                 if (!chat || chat === "status@broadcast") return;
                 const emitGroupUpdate = update => {
-                    ev.emit("groups.update", [{ id: chat, ...update }]);
+                    conn.ev.emit("groups.update", [{ id: chat, ...update }]);
                 };
                 switch (m.messageStubType) {
                     case WAMessageStubType.REVOKE:
