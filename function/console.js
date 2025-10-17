@@ -19,8 +19,8 @@ const sleep = ms => {
 };
 
 export async function headerLog() {
-    console.clear();
     await sleep(600);
+    console.clear();
     CFonts.say("\n XRDHZ-MD", {
         font: "tiny",
         align: "left",

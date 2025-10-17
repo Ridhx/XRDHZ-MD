@@ -77,6 +77,7 @@ export async function connectionUpdate(update, conn) {
             await global.reloadHandler(true);
             console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`MENGHUBUNGKAN KEMBALI 🌐`)}`);
         }
+
         if (receivedPendingNotifications)
             console.log(
                 `${chalk.white.bold(" [SISTEM]")} ${chalk.yellowBright.bold(`MENUNGGU PESAN MASUK 📥`)}`

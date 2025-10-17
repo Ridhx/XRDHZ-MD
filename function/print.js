@@ -35,7 +35,7 @@ ${chalk.white(" » NAME:")} ${chalk.blueBright("%s")}
 ${chalk.white(" » DATE:")} ${chalk.gray("%s")}
 ${chalk.white(" » SEND TO:")} ${chalk.green("%s")}
 ${chalk.white(" » MTYPE:")} ${chalk.yellow("%s")} ${chalk.red("[%s %sB]")}`.trim(),
-        conn.user.name,
+        global.namabot,
         sender,
         _name,
         (m.messageTimestamp
