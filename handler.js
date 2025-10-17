@@ -397,13 +397,13 @@ export async function groupsUpdate(groupsUpdate) {
     if (!groupsUpdate) return;
     for (const groupUpdate of groupsUpdate) {
         const id = groupUpdate.id;
-        const user = await conn.getJid(groupUpdate.author);
-        if (!id || !user) continue;
+        if (!id) continue;
 
-        let text;
-        let chat = global.db.data?.chats[id];
+        let text = "";
+        const chat = global.db.data?.chats[id];
         if (!chat?.detect) continue;
 
+        const user = await conn.getJid(groupUpdate.author);
         if (groupUpdate.desc)
             text = (chat?.sDesc || "Deskripsi group diganti oleh @user\n\n@desc")
                 .replace("@user", `@${user.split("@")[0]}`)
@@ -412,24 +412,20 @@ export async function groupsUpdate(groupsUpdate) {
             text = (chat?.sSubject || "Judul group diganti oleh @user\n\n@subject")
                 .replace("@user", `@${user.split("@")[0]}`)
                 .replace("@subject", groupUpdate.subject);
-        if (groupUpdate.icon)
-            text = (chat?.sIcon || "Ikon group diganti oleh @user").replace(
-                "@user",
-                `@${user.split("@")[0]}`
-            );
         if (groupUpdate.inviteCode)
             text = "Link group diganti oleh @user".replace("@user", `@${user.split("@")[0]}`);
-
+        if (groupUpdate.icon) text = "Ikon group telah diganti";
         if (!text) continue;
         await this.sendMessage(id, {
             text,
-            mentions: [user]
+            mentions: await conn.parseMention(text)
         });
     }
 }
 
 /**
- *
+ * Handler deleted message
+ * @param {import('baileys').BaileysEventMap<unknown>['message.delete']} message
  */
 export async function catchDeleted(message) {
     if (!message) return;
