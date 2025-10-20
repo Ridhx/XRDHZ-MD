@@ -558,25 +558,38 @@ export function makeWASocket(connectionOptions, options = {}) {
              * @param {String} text
              * @returns {Array<String>}
              */
-            async value(text = "", conn) {
-                const regex = /@([0-9]{5,16}|0)/g;
+            async value(text = "") {
+                const regex = /@?(\d{5,16})(?:@s\.whatsapp\.net)?/g;
                 const mentions = [];
                 let match;
 
                 while ((match = regex.exec(text)) !== null) {
                     const raw = match[1];
-                    const isPhoneNumber = /^[1-9]\d{6,13}$/.test(raw);
-                    if (isPhoneNumber) {
-                        const jid = `${raw}@s.whatsapp.net`;
-                        mentions.push(jid);
+                    const pn = parsePhoneNumber(`+${raw}`);
+
+                    if (pn.valid) {
+                        mentions.push(`${raw}@s.whatsapp.net`);
                     } else {
-                        const rawJid = `${raw}@lid`;
-                        const jid = this.getJid(rawJid);
-                        mentions.push(jid);
+                        mentions.push(`${raw}@lid`);
                     }
                 }
 
-                return mentions;
+                // Hapus duplikat
+                const uniqueMentions = [...new Set(mentions)];
+                const resolvedJids = [];
+
+                // Loop dan cek dengan conn.getJid()
+                for (const jid of uniqueMentions) {
+                    try {
+                        const fullJid = await conn.getJid(jid);
+                        resolvedJids.push(fullJid);
+                    } catch {
+                        // Jika gagal, tetap pakai JID asli
+                        resolvedJids.push(jid);
+                    }
+                }
+
+                return resolvedJids;
             },
             enumerable: true
         },
