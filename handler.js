@@ -72,7 +72,7 @@ export async function handler(chatUpdate) {
                     if (!("antilink" in chat)) chat.antilink = false;
                     if (!("antivirtex" in chat)) chat.antivirtex = false;
                     if (!("mute" in chat)) chat.mute = false;
-                    if (!("detect" in chat)) chat.detect = false;
+                    if (!("detect" in chat)) chat.detect = true;
                     if (!("sambutan" in chat)) chat.sambutan = true;
                     if (!("sewa" in chat)) chat.sewa = false;
                     if (!("sWelcome" in chat)) chat.sWelcome = "";
@@ -86,7 +86,7 @@ export async function handler(chatUpdate) {
                         antilink: false,
                         antivirtex: false,
                         mute: false,
-                        detect: false,
+                        detect: true,
                         sambutan: true,
                         sewa: false,
                         sWelcome: "",
@@ -338,7 +338,7 @@ export async function participantsUpdate({ id, participants, action }) {
             if (chat.sambutan) {
                 let groupMetadata = (await this.groupMetadata(id)) || (conn.chats[id] || {})?.metadata;
                 for (let user of participants) {
-                    const rawJid = (await conn.getJid(user)) || user;
+                    const rawJid = (await conn.getJid(user?.id || user?.phoneNumber)) || user.id;
                     message = (
                         action === "add"
                             ? (chat.sWelcome || conn.sWelcome || "Selamat Datang @user")
@@ -367,7 +367,9 @@ export async function participantsUpdate({ id, participants, action }) {
             break;
         case "promote":
         case "demote":
-            const rawJid = (await conn.getJid(participants[0])) || participants[0];
+            const rawJid =
+                (await conn.getJid(participants[0]?.id || participants[0]?.phoneNumber)) ||
+                participants[0].id;
             message = (
                 action === "promote"
                     ? chat.sPromote || conn.sPromote || "Selamat @user telah menjadi Admin"
