@@ -59,15 +59,19 @@ export function makeWASocket(connectionOptions, options = {}) {
         // conn.getJid
         getJid: {
             value(sender) {
-                if (!typeof sender === "string") return;
                 if (!conn.storeLid) conn.storeLid = {};
-                if (!sender?.endsWith("@lid") && sender?.endsWith("@s.whatsapp.net")) return sender;
+                if (!typeof sender === "string") return;
+                if (!sender.endsWith("@lid") && sender.endsWith("@s.whatsapp.net")) return sender.decodeJid();
                 if (conn.storeLid[sender]) return conn.storeLid[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
                     let user = chat.metadata.participants.find(p => p.lid === sender || p.id === sender);
                     if (user) {
-                        return (conn.storeLid[sender] = user?.phoneNumber || user?.jid || user?.id);
+                        return (conn.storeLid[sender] = (
+                            user?.phoneNumber ||
+                            user?.jid ||
+                            user?.id
+                        ).decodeJid());
                     }
                 }
                 return sender;
@@ -917,9 +921,7 @@ export async function smsg(conn, m, hasParent) {
                 // Ambil jika participant jid saja (Uji Coba)
                 const participant = m.key.participant;
                 const participantAlt = m.key.participantAlt;
-                const remoteJid = m.key.remoteJid;
-                const remoteJidAlt = m.key.remoteJidAlt;
-                return conn?.getJid(participant || participantAlt || remoteJid || remoteJidAlt);
+                return conn?.getJid((participant || participantAlt).decodeJid());
             },
             enumerable: true
         },
@@ -1015,8 +1017,7 @@ export async function smsg(conn, m, hasParent) {
         },
         quoted: {
             get() {
-                const mq = this;
-                const msg = mq.msg;
+                const msg = this.msg;
                 const contextInfo = msg?.contextInfo;
                 const quoted = contextInfo?.quotedMessage;
                 if (!msg || !contextInfo || !quoted) return null;
@@ -1076,7 +1077,7 @@ export async function smsg(conn, m, hasParent) {
                         },
                         chat: {
                             get() {
-                                return contextInfo.remoteJid || mq.chat;
+                                return contextInfo.remoteJid || this.chat;
                             },
                             enumerable: true
                         },
@@ -1090,7 +1091,7 @@ export async function smsg(conn, m, hasParent) {
                             get() {
                                 // Ambil jika participant jid saja (Uji Coba)
                                 let participant = contextInfo.participant;
-                                const rawJid = (participant || this.chat || "").decodeJid();
+                                const rawJid = (participant || "").decodeJid();
                                 return conn?.getJid(rawJid);
                             },
                             enumerable: true
@@ -1112,7 +1113,7 @@ export async function smsg(conn, m, hasParent) {
                         mentionedJid: {
                             get() {
                                 let raws =
-                                    q.contextInfo?.mentionedJid || mq.getQuotedObj()?.mentionedJid || [];
+                                    q.contextInfo?.mentionedJid || this.getQuotedObj()?.mentionedJid || [];
                                 return raws.map(Jid => conn.getJid(Jid));
                             },
                             enumerable: true
@@ -1133,7 +1134,7 @@ export async function smsg(conn, m, hasParent) {
                                         id: this.id
                                     },
                                     message: quoted,
-                                    ...(mq.isGroup
+                                    ...(this.isGroup
                                         ? {
                                               participant: this.sender
                                           }
