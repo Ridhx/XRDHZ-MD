@@ -59,8 +59,9 @@ export function makeWASocket(connectionOptions, options = {}) {
         // conn.getJid
         getJid: {
             value(sender) {
+                if (!typeof sender === "string") return;
                 if (!conn.storeLid) conn.storeLid = {};
-                if (!sender?.endsWith("@lid") || sender?.endsWith("@s.whatsapp.net")) return sender;
+                if (!sender?.endsWith("@lid") && sender?.endsWith("@s.whatsapp.net")) return sender;
                 if (conn.storeLid[sender]) return conn.storeLid[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
