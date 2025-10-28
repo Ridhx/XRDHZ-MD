@@ -26,7 +26,7 @@ import { requestPairing, connectionUpdate } from "./function/connection.js";
 const { Browsers, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } =
     await import("baileys");
 
-await protoType(); // Aktifkan protoType :D
+protoType(); // Aktifkan protoType :D
 global.__filename = function filename(pathURL = import.meta.url, rmPrefix = platform !== "win32") {
     return rmPrefix
         ? /file:\/\/\//.test(pathURL)
@@ -44,7 +44,7 @@ const __dirname = global.__dirname(import.meta.url);
 const { state, saveCreds } = await useMultiFileAuthState("./sessions");
 
 const connectionOptions = {
-    version: [2, 3000, 1025190524], // OPSIONAL
+    version: [2, 3000, 1029013026], // OPSIONAL
     printQRInTerminal: false,
     logger: pino({ level: "silent" }),
     browser: Browsers.ubuntu("Chrome"),
@@ -76,7 +76,7 @@ const connectionOptions = {
 };
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
-global.conn = await makeWASocket(connectionOptions, global.opts);
+global.conn = makeWASocket(connectionOptions, global.opts);
 
 global.prefix = new RegExp(
     "^[" +

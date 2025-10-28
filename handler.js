@@ -311,7 +311,7 @@ export async function handler(chatUpdate) {
             }
         }
     } catch (error) {
-        console.error(error);
+        global.reloadHandler(true);
     } finally {
         if (global.autoRead || global.db.data.settings[conn.user.jid].autoread) {
             await conn.readMessages([m.key]);
