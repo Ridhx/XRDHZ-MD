@@ -60,7 +60,7 @@ export function makeWASocket(connectionOptions, options = {}) {
         getJid: {
             value(sender) {
                 if (!conn.storeLid) conn.storeLid = {};
-                if (!typeof sender === "string") return;
+                if (!sender || !typeof sender === "string") return;
                 if (!sender.endsWith("@lid") && sender.endsWith("@s.whatsapp.net")) return sender.decodeJid();
                 if (conn.storeLid[sender]) return conn.storeLid[sender];
                 for (let chat of Object.values(conn.chats)) {
@@ -921,7 +921,7 @@ export async function smsg(conn, m, hasParent) {
                 // Ambil jika participant jid saja (Uji Coba)
                 const participant = m.key.participant;
                 const participantAlt = m.key.participantAlt;
-                return conn?.getJid((participant || participantAlt).decodeJid());
+                return conn?.getJid(participant || participantAlt);
             },
             enumerable: true
         },
@@ -1090,8 +1090,7 @@ export async function smsg(conn, m, hasParent) {
                         sender: {
                             get() {
                                 // Ambil jika participant jid saja (Uji Coba)
-                                let participant = contextInfo.participant;
-                                const rawJid = (participant || "").decodeJid();
+                                const rawJid = contextInfo.participant || "";
                                 return conn?.getJid(rawJid);
                             },
                             enumerable: true
