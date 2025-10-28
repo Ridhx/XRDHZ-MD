@@ -147,8 +147,8 @@ if (existsSync(tmpFolder)) {
 // Start kode pairing Jika belum ada session
 async function StartPairing() {
     if (existsSync("./sessions/creds.json") && !conn.authState.creds.registered) {
-        console.log(chalk.yellow("-- WARNING: file session telah rusak, hapus dan hubungkan ulang."));
-        process.exit(0);
+        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.red.bold(`ERROR SESSION RUSAK`)}`);
+        process.exit(1);
     }
 
     if (!conn.authState.creds.registered) {
