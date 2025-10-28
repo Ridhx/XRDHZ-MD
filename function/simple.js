@@ -60,12 +60,12 @@ export function makeWASocket(connectionOptions, options = {}) {
         getJid: {
             value(sender) {
                 if (!conn.storeLid) conn.storeLid = {};
-                if (!sender || !typeof sender === "string") return;
+                if (!sender || typeof sender !== "string") return "";
                 if (!sender.endsWith("@lid") && sender.endsWith("@s.whatsapp.net")) return sender.decodeJid();
                 if (conn.storeLid[sender]) return conn.storeLid[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
-                    let user = chat.metadata.participants.find(p => p.lid === sender || p.id === sender);
+                    let user = chat.metadata.participants.find(p => p.id === sender || p.lid === sender);
                     if (user) {
                         return (conn.storeLid[sender] = (
                             user?.phoneNumber ||
@@ -628,8 +628,9 @@ export function makeWASocket(connectionOptions, options = {}) {
              * @param {String} jid
              * @param {Boolean} withoutContact
              */
-            value(jid = "", withoutContact = false) {
-                jid = conn.decodeJid(jid);
+            async value(jid = "", withoutContact = false) {
+                if (!jid) return "";
+                jid = await conn.decodeJid(jid);
                 withoutContact = conn.withoutContact || withoutContact;
                 let v;
                 if (jid.endsWith("@g.us"))
