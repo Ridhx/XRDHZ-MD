@@ -6,10 +6,11 @@ import { unwatchFile, watchFile, readFileSync } from "fs";
 
 export default async function (m, conn = { user: {} }) {
     if (m.fromMe) return;
-    const _name = m.pushName ? m.pushName : await conn.getName(m.sender);
+    const _name = m.pushName ? m.pushName : "unkown";
     const _chat = m.chat.endsWith("@g.us") ? m.chat : "~Private Chat";
-    const sender = await parsePhoneNumber("+" + m.sender.replace("@s.whatsapp.net", ""))?.number
-        ?.international;
+    const sender = m.sender
+        ? await parsePhoneNumber("+" + m.sender.replace("@s.whatsapp.net", ""))?.number?.international
+        : "unkown";
 
     let user = global.db.data?.users[m.sender];
     let filesize =
