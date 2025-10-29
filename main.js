@@ -23,7 +23,7 @@ import { Low, JSONFile } from "lowdb";
 import { makeWASocket, protoType } from "./function/simple.js";
 import { requestPairing, connectionUpdate } from "./function/connection.js";
 
-const { Browsers, useMultiFileAuthState, fetchLatestBaileysVersion, makeCacheableSignalKeyStore } =
+const { Browsers, useMultiFileAuthState, fetchLatestWaWebVersion, makeCacheableSignalKeyStore } =
     await import("baileys");
 
 protoType(); // Aktifkan protoType :D
@@ -42,9 +42,10 @@ global.__dirname = function dirname(pathURL) {
 };
 const __dirname = global.__dirname(import.meta.url);
 const { state, saveCreds } = await useMultiFileAuthState("./sessions");
+const { version, isLatest } = await fetchLatestWaWebVersion();
 
 const connectionOptions = {
-    version: [2, 3000, 1029013026], // OPSIONAL
+    version: version, // OPSIONAL
     printQRInTerminal: false,
     logger: pino({ level: "silent" }),
     browser: Browsers.ubuntu("Chrome"),
