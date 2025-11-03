@@ -922,7 +922,8 @@ export async function smsg(conn, m, hasParent) {
                 // Ambil jika participant jid saja (Uji Coba)
                 const participant = m.key.participant;
                 const participantAlt = m.key.participantAlt;
-                return conn?.getJid(participant || participantAlt);
+                const remoteJidAlt = m.key.remoteJidAlt;
+                return conn?.getJid(participant || participantAlt || remoteJidAlt);
             },
             enumerable: true
         },
