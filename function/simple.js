@@ -1006,7 +1006,8 @@ export async function smsg(conn, m, hasParent) {
         },
         mentionedJid: {
             get() {
-                let raws = (m.msg?.contextInfo?.mentionedJid?.length && m.msg.contextInfo.mentionedJid) || [];
+                let raw = (m.msg?.contextInfo?.mentionedJid?.length && m.msg.contextInfo.mentionedJid) || [];
+                let raws = m.text ? conn.parseMention(m.text) : raw;
                 return raws.map(Jid => conn.getJid(Jid));
             },
             enumerable: true
@@ -1113,8 +1114,17 @@ export async function smsg(conn, m, hasParent) {
                         },
                         mentionedJid: {
                             get() {
-                                let raws =
+                                let raw =
                                     q.contextInfo?.mentionedJid || this.getQuotedObj()?.mentionedJid || [];
+                                let raws = text
+                                    ? conn.parseMention(
+                                          text ||
+                                              this.caption ||
+                                              this.contentText ||
+                                              this.selectedDisplayText ||
+                                              ""
+                                      )
+                                    : raw;
                                 return raws.map(Jid => conn.getJid(Jid));
                             },
                             enumerable: true
