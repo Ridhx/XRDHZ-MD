@@ -358,7 +358,7 @@ export function makeWASocket(connectionOptions, options = {}) {
              * @param {import("baileys").proto.WebMessageInfo} quoted
              * @param {Object} options
              */
-            value(jid, text = "", quoted, options) {
+            async value(jid, text = "", quoted, options) {
                 return Buffer.isBuffer(text)
                     ? conn.sendFile(jid, text, "file", "", quoted, false, options)
                     : conn.sendMessage(
@@ -367,7 +367,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                               ...options,
                               text,
                               contextInfo: {
-                                  mentionedJid: conn.parseMention(text)
+                                  mentionedJid: await conn.parseMention(text)
                               },
                               ...options
                           },
@@ -579,22 +579,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                     }
                 }
 
-                // Hapus duplikat
-                const uniqueMentions = [...new Set(mentions)];
-                const resolvedJids = [];
-
-                // Loop dan cek dengan conn.getJid()
-                for (const jid of uniqueMentions) {
-                    try {
-                        const fullJid = await conn.getJid(jid);
-                        resolvedJids.push(fullJid);
-                    } catch {
-                        // Jika gagal, tetap pakai JID asli
-                        resolvedJids.push(jid);
-                    }
-                }
-
-                return resolvedJids;
+                return mentions;
             },
             enumerable: true
         },
@@ -625,15 +610,16 @@ export function makeWASocket(connectionOptions, options = {}) {
         getName: {
             /**
              * Ambil nama dari jid
-             * @param {String} jid
+             * @param {String} rawjid
              * @param {Boolean} withoutContact
              */
-            async value(jid = "", withoutContact = false) {
-                if (!jid) return "";
-                jid = await conn.decodeJid(jid);
+            async value(rawjid = "", withoutContact = false) {
+                if (!rawjid) return "";
+                let jid = await conn.decodeJid(rawjid);
                 withoutContact = conn.withoutContact || withoutContact;
                 let v;
-                if (jid.endsWith("@g.us"))
+
+                if (jid.endsWith("@g.us")) {
                     return new Promise(async resolve => {
                         v = conn.chats[jid] || {};
                         if (!(v.name || v.subject)) v = (await conn.groupMetadata(jid)) || {};
@@ -644,7 +630,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                                     ?.international
                         );
                     });
-                else
+                } else {
                     v =
                         jid === "0@s.whatsapp.net"
                             ? {
@@ -654,14 +640,38 @@ export function makeWASocket(connectionOptions, options = {}) {
                             : areJidsSameUser(jid, conn.user.id)
                             ? conn.user
                             : conn.chats[jid] || {};
-                return (
-                    (withoutContact ? "" : v.name) ||
-                    v.subject ||
-                    v.vname ||
-                    v.notify ||
-                    v.verifiedName ||
-                    parsePhoneNumber("+" + jid.replace("@s.whatsapp.net", ""))?.number?.international
-                );
+
+                    let name =
+                        (withoutContact ? "" : v.name) || v.subject || v.vname || v.notify || v.verifiedName;
+
+                    if (!name && jid.endsWith("@s.whatsapp.net")) {
+                        try {
+                            const lidJid = await conn.signalRepository.lidMapping.getLIDForPN(jid);
+
+                            if (lidJid && lidJid !== jid) {
+                                const lidV = conn.chats[lidJid] || {};
+
+                                const lidName =
+                                    (withoutContact ? "" : lidV.name) ||
+                                    lidV.subject ||
+                                    lidV.vname ||
+                                    lidV.notify ||
+                                    lidV.verifiedName;
+
+                                if (lidName) {
+                                    name = lidName;
+                                }
+                            }
+                        } catch (e) {
+                            // console.warn(`Failed to get LID for ${jid}:`, e); // Opsional untuk debug
+                        }
+                    }
+
+                    return (
+                        name ||
+                        parsePhoneNumber("+" + jid.replace("@s.whatsapp.net", ""))?.number?.international
+                    );
+                }
             },
             enumerable: true
         },
@@ -922,8 +932,9 @@ export async function smsg(conn, m, hasParent) {
                 // Ambil jika participant jid saja (Uji Coba)
                 const participant = m.key.participant;
                 const participantAlt = m.key.participantAlt;
+                const remoteJid = m.key.remoteJid;
                 const remoteJidAlt = m.key.remoteJidAlt;
-                return conn?.getJid(participant || participantAlt || remoteJidAlt);
+                return conn?.getJid(participant || participantAlt || remoteJid || remoteJidAlt);
             },
             enumerable: true
         },
@@ -1005,9 +1016,9 @@ export async function smsg(conn, m, hasParent) {
             enumerable: true
         },
         mentionedJid: {
-            get() {
+            async get() {
                 let raw = (m.msg?.contextInfo?.mentionedJid?.length && m.msg.contextInfo.mentionedJid) || [];
-                let raws = m.text ? conn.parseMention(m.text) : raw;
+                let raws = m.text ? await conn.parseMention(m.text) : raw;
                 return raws.map(Jid => conn.getJid(Jid));
             },
             enumerable: true
@@ -1113,10 +1124,11 @@ export async function smsg(conn, m, hasParent) {
                             enumerable: true
                         },
                         mentionedJid: {
-                            get() {
+                            async get() {
                                 let raw =
                                     q.contextInfo?.mentionedJid || this.getQuotedObj()?.mentionedJid || [];
-                                let raws = text ? conn.parseMention(text) : raw;
+                                let raws = this.text ? await conn.parseMention(this.text) : raw;
+                                console.log(raws);
                                 return raws.map(Jid => conn.getJid(Jid));
                             },
                             enumerable: true
@@ -1148,6 +1160,19 @@ export async function smsg(conn, m, hasParent) {
                         fakeObj: {
                             get() {
                                 return this.vM;
+                            }
+                        },
+                        getQuotedObj: {
+                            value() {
+                                if (!this.id) return null;
+                                const q = proto.WebMessageInfo.create(conn?.loadMessage(this.id) || this.vM);
+                                return smsg(conn, q);
+                            },
+                            enumerable: true
+                        },
+                        getQuotedMessage: {
+                            get() {
+                                return this.getQuotedObj;
                             }
                         },
                         download: {
