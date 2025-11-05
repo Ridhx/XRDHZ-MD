@@ -367,7 +367,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                               ...options,
                               text,
                               contextInfo: {
-                                  mentionedJid: await conn.parseMention(text)
+                                  mentionedJid: conn.parseMention(text)
                               },
                               ...options
                           },
@@ -563,7 +563,7 @@ export function makeWASocket(connectionOptions, options = {}) {
              * @param {String} text
              * @returns {Array<String>}
              */
-            async value(text = "") {
+            value(text = "") {
                 const regex = /@?(\d{5,16})(?:@s\.whatsapp\.net)?/g;
                 const mentions = [];
                 let match;
@@ -574,11 +574,10 @@ export function makeWASocket(connectionOptions, options = {}) {
 
                     if (pn.valid) {
                         mentions.push(`${raw}@s.whatsapp.net`);
-                    } else {
+                    } else if (raw.length >= 13) {
                         mentions.push(`${raw}@lid`);
                     }
                 }
-
                 return mentions;
             },
             enumerable: true
@@ -1016,9 +1015,9 @@ export async function smsg(conn, m, hasParent) {
             enumerable: true
         },
         mentionedJid: {
-            async get() {
+            get() {
                 let raw = m.msg?.contextInfo?.mentionedJid || [];
-                let raws = raw.length > 0 ? raw : m.text ? await conn.parseMention(m.text) : [];
+                let raws = raw.length > 0 ? raw : m.text ? conn.parseMention(m.text) : [];
                 return raws.map(Jid => conn.getJid(Jid));
             },
             enumerable: true
@@ -1101,6 +1100,12 @@ export async function smsg(conn, m, hasParent) {
                             },
                             enumerable: true
                         },
+                        isGroup: {
+                            get() {
+                                return this.chat.endsWith("@g.us") ? true : false;
+                            },
+                            enumerable: true
+                        },
                         sender: {
                             get() {
                                 // Ambil jika participant jid saja (Uji Coba)
@@ -1124,15 +1129,10 @@ export async function smsg(conn, m, hasParent) {
                             enumerable: true
                         },
                         mentionedJid: {
-                            async get() {
-                                let raw =
-                                    q.contextInfo?.mentionedJid || this.getQuotedObj()?.mentionedJid || [];
+                            get() {
+                                let raw = conn?.storeMentions[this.id] || [];
                                 let raws =
-                                    raw.length > 0
-                                        ? raw
-                                        : this.text
-                                        ? await conn.parseMention(this.text)
-                                        : [];
+                                    raw.length > 0 ? raw : this.text ? conn.parseMention(this.text) : [];
                                 return raws.map(Jid => conn.getJid(Jid));
                             },
                             enumerable: true
@@ -1153,7 +1153,7 @@ export async function smsg(conn, m, hasParent) {
                                         id: this.id
                                     },
                                     message: quoted,
-                                    ...(this.isGroup
+                                    ...(m.isGroup
                                         ? {
                                               participant: this.sender
                                           }
