@@ -1116,15 +1116,7 @@ export async function smsg(conn, m, hasParent) {
                             get() {
                                 let raw =
                                     q.contextInfo?.mentionedJid || this.getQuotedObj()?.mentionedJid || [];
-                                let raws = text
-                                    ? conn.parseMention(
-                                          text ||
-                                              this.caption ||
-                                              this.contentText ||
-                                              this.selectedDisplayText ||
-                                              ""
-                                      )
-                                    : raw;
+                                let raws = text ? conn.parseMention(text) : raw;
                                 return raws.map(Jid => conn.getJid(Jid));
                             },
                             enumerable: true
