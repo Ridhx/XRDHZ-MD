@@ -1208,6 +1208,14 @@ export async function smsg(conn, m, hasParent) {
             },
             enumerable: true
         },
+        download: {
+            value(saveToFile = false) {
+                const mtype = m.mediaType;
+                return conn?.downloadM(m.mediaMessage[mtype], mtype.replace(/message/i, ""), saveToFile);
+            },
+            enumerable: true,
+            configurable: true
+        },
         reply: {
             value(text, chatId, options) {
                 return conn.reply(chatId ? chatId : this.chat, text, this, options);
