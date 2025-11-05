@@ -1017,8 +1017,8 @@ export async function smsg(conn, m, hasParent) {
         },
         mentionedJid: {
             async get() {
-                let raw = (m.msg?.contextInfo?.mentionedJid?.length && m.msg.contextInfo.mentionedJid) || [];
-                let raws = m.text ? await conn.parseMention(m.text) : raw;
+                let raw = m.msg?.contextInfo?.mentionedJid || [];
+                let raws = raw.length > 0 ? raw : m.text ? await conn.parseMention(m.text) : [];
                 return raws.map(Jid => conn.getJid(Jid));
             },
             enumerable: true
@@ -1127,8 +1127,12 @@ export async function smsg(conn, m, hasParent) {
                             async get() {
                                 let raw =
                                     q.contextInfo?.mentionedJid || this.getQuotedObj()?.mentionedJid || [];
-                                let raws = this.text ? await conn.parseMention(this.text) : raw;
-                                console.log(raws);
+                                let raws =
+                                    raw.length > 0
+                                        ? raw
+                                        : this.text
+                                        ? await conn.parseMention(this.text)
+                                        : [];
                                 return raws.map(Jid => conn.getJid(Jid));
                             },
                             enumerable: true
