@@ -22,6 +22,11 @@ export async function handler(chatUpdate) {
 
     try {
         m = (await smsg(this, m)) || m;
+        if (!conn.storeMentions) conn.storeMentions = {};
+        if (m?.msg?.contextInfo?.mentionedJid?.length > 0) {
+            const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getJid(jid)))];
+            conn.storeMentions[m.id] = jidMentions;
+        }
         if (m.isBaileys) return;
         if (m.sender.endsWith("@broadcast") || m.sender.endsWith("@newsletter") || m.sender.endsWith("@lid"))
             return;
