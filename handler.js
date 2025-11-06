@@ -23,7 +23,7 @@ export async function handler(chatUpdate) {
     try {
         m = (await smsg(this, m)) || m;
         if (!conn.storeMentions) conn.storeMentions = {};
-        if (m?.msg?.contextInfo?.mentionedJid?.length > 0) {
+        if (m?.msg?.contextInfo?.mentionedJid?.length) {
             const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getJid(jid)))];
             conn.storeMentions[m.id] = jidMentions;
         }
