@@ -65,7 +65,6 @@ export function makeWASocket(connectionOptions, options = {}) {
                 if (conn.storeLid[sender]) return conn.storeLid[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
-                    if (sender.endsWith("@g.us")) continue;
                     let user = chat.metadata.participants.find(p => p.id === sender || p.lid === sender);
                     if (user) {
                         return (conn.storeLid[sender] = (
