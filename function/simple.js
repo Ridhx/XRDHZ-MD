@@ -65,6 +65,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                 if (conn.storeLid[sender]) return conn.storeLid[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
+                    if (sender.endsWith("@g.us")) continue;
                     let user = chat.metadata.participants.find(p => p.id === sender || p.lid === sender);
                     if (user) {
                         return (conn.storeLid[sender] = (
@@ -559,12 +560,12 @@ export function makeWASocket(connectionOptions, options = {}) {
         // conn.parseMention
         parseMention: {
             /**
-             * Parse string menjadi mentionedJid(s) untuk nomor telepon atau ID lainnya
+             * Parse string menjadi mentionedJid(s) untuk nomor telepon, @lid, atau ID lainnya
              * @param {String} text
              * @returns {Array<String>}
              */
             value(text = "") {
-                const regex = /@?(\d{5,16})(?:@s\.whatsapp\.net)?/g;
+                const regex = /@?(\d{5,20})(?:@s\.whatsapp\.net)?/g;
                 const mentions = [];
                 let match;
 
@@ -574,11 +575,12 @@ export function makeWASocket(connectionOptions, options = {}) {
 
                     if (pn.valid) {
                         mentions.push(`${raw}@s.whatsapp.net`);
-                    } else if (raw.length >= 13) {
-                        mentions.push(`${raw}@lid`);
+                    } else if (raw.length >= 13 && !raw.startsWith("1203")) {
+                        mentions.push(conn.getJid(`${raw}@lid`));
                     }
                 }
-                return mentions;
+
+                return [...new Set(mentions)];
             },
             enumerable: true
         },
