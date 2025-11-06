@@ -10,7 +10,7 @@
     },
     "scripts": {
         "start": "node start.js",
-        "test": "node lib/test.js"
+        "test": "node function/test.js"
     },
     "keywords": [
         "whatsapp",
