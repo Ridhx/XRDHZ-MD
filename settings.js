@@ -26,7 +26,8 @@ global.lgh = "https://github.com/Ridhx/XRDHZ-MD"; // Github
 global.lwa = "https://wa.me/6285751561624"; // Whatsapp
 global.lig = ""; // Instagram
 global.lgc = ""; // Group Chat Whatsapp
-global.lch = ""; // Channels Whatsapp 
+global.lch = "https://whatsapp.com/channel/0029VaXLKZUBvvsj6Vtf9C09"; // Channels Whatsapp 
+
 let file = fileURLToPath(import.meta.url);
 watchFile(file, async () => {
     unwatchFile(file);
