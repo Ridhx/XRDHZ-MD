@@ -1,6 +1,6 @@
 {
     "name": "xrdhz-md",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "description": "Simple Free Whatsapp Bot Script Tipe ESM.",
     "main": "main.js",
     "directories": {
@@ -9,7 +9,8 @@
         "src": "src"
     },
     "scripts": {
-        "start": "node start.js"
+        "start": "node start.js",
+        "test": "node lib/test.js"
     },
     "keywords": [
         "whatsapp",
@@ -30,6 +31,7 @@
         "child_process": "^1.0.2",
         "cluster": "^0.7.7",
         "file-type": "^21.0.0",
+        "fluent-ffmpeg": "^2.1.3",
         "form-data": "^4.0.4",
         "human-readable": "^0.2.1",
         "jimp": "^1.6.0",
@@ -38,6 +40,7 @@
         "moment-timezone": "^0.6.0",
         "node-fetch": "^3.3.2",
         "node-os-utils": "^1.3.6",
+        "node-webpmux": "^3.2.1",
         "os": "^0.1.2",
         "path": "^0.12.7",
         "perf_hooks": "^0.0.1",
