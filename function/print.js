@@ -6,6 +6,16 @@ import { unwatchFile, watchFile, readFileSync } from "fs";
 
 export default async function (m, conn = { user: {} }) {
     if (m.fromMe) return;
+
+    if (
+        !m.message ||
+        m.message.protocolMessage ||
+        m.message.senderKeyDistributionMessage ||
+        m.mtype === "protocolMessage" ||
+        m.mtype === "senderKeyDistributionMessage"
+    )
+        return;
+
     const _name = m.pushName ? m.pushName : "unknown";
     const _chat = m.chat.endsWith("@g.us") ? m.chat : "~Private Chat";
     const sender = m.sender
@@ -53,8 +63,6 @@ ${chalk.white(" » MTYPE:")} ${chalk.yellow("%s")} ${chalk.red("[%s %sB]")}`.tri
         filesize === 0 ? 0 : (filesize / 1009 ** Math.floor(Math.log(filesize) / Math.log(1000))).toFixed(1),
         ["", ..."KMGTP"][Math.floor(Math.log(filesize) / Math.log(1000))] || ""
     );
-    if (typeof m.text === "string" && m.text) {
-    }
     console.log(chalk.gray("-".repeat(50)));
 }
 
