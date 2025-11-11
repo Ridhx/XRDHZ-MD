@@ -49,6 +49,21 @@ export function makeWASocket(connectionOptions, options = {}) {
             value: { ...(options.chats || {}) },
             writable: true
         },
+        // conn.storeLid
+        storeLid: {
+            value: {},
+            writable: true
+        },
+        // conn.storeNumber
+        storeNumber: {
+            value: {},
+            writable: true
+        },
+        // conn.storeMentions
+        storeMentions: {
+            value: {},
+            writable: true
+        },
         // conn.decodeJid
         decodeJid: {
             value(jid) {
@@ -59,14 +74,6 @@ export function makeWASocket(connectionOptions, options = {}) {
         // conn.getNumber
         getNumber: {
             value(sender) {
-                if (!conn.storeNumber) {
-                    Object.defineProperty(conn, "storeNumber", {
-                        value: {},
-                        writable: true,
-                        enumerable: false,
-                        configurable: true
-                    });
-                }
                 if (!sender || typeof sender !== "string") return "";
                 if (sender.endsWith("@s.whatsapp.net")) return sender.split("@")[0];
                 if (conn.storeNumber[sender]) return conn.storeNumber[sender];
@@ -83,24 +90,11 @@ export function makeWASocket(connectionOptions, options = {}) {
         // conn.getLid
         getLid: {
             value(sender) {
-                if (!conn.storeLid) {
-                    Object.defineProperty(conn, "storeLid", {
-                        value: {},
-                        writable: true,
-                        enumerable: false,
-                        configurable: true
-                    });
-                }
-
                 if (!sender || typeof sender !== "string") return "";
                 const decoded = sender.decodeJid();
                 if (conn.storeLid[decoded]) return conn.storeLid[decoded];
                 if (sender.endsWith("@lid")) return decoded;
 
-                if (sender.endsWith("@s.whatsapp.net")) {
-                    const lid = conn.signalRepository?.lidMapping?.getLIDForPN?.(decoded);
-                    if (lid) return (conn.storeLid[decoded] = conn.decodeJid(lid));
-                }
                 for (let chat of Object.values(conn.chats || {})) {
                     const participants = chat.metadata?.participants;
                     if (!participants) continue;
