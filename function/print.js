@@ -19,7 +19,7 @@ export default async function (m, conn = { user: {} }) {
     const _name = m.pushName ? m.pushName : "unknown";
     const _chat = m.chat.endsWith("@g.us") ? m.chat : "~Private Chat";
     const sender = m.sender
-        ? await parsePhoneNumber("+" + m.sender.replace("@s.whatsapp.net", ""))?.number?.international
+        ? await parsePhoneNumber("+" + conn.getNumber(m.sender))?.number?.international
         : "unknown";
 
     let user = global.db.data?.users[m.sender];
