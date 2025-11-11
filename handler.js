@@ -22,14 +22,6 @@ export async function handler(chatUpdate) {
 
     try {
         m = (await smsg(this, m)) || m;
-        if (!conn.storeMentions) {
-            Object.defineProperty(conn, "storeMentions", {
-                value: {},
-                writable: true,
-                enumerable: false,
-                configurable: true
-            });
-        }
         if (m?.msg?.contextInfo?.mentionedJid?.length) {
             const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getLid(jid)))];
             conn.storeMentions[m.id] = jidMentions;
