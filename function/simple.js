@@ -106,6 +106,19 @@ export function makeWASocket(connectionOptions, options = {}) {
                 return decoded;
             }
         },
+        // conn.getLidPN
+        getLidPN: {
+            async value(sender) {
+                if (!sender || typeof sender !== "string") return "";
+                if (sender.endsWith("@s.whatsapp.net")) {
+                    const lid = await conn.signalRepository?.lidMapping?.getLIDForPN?.(sender);
+                    return lid.decodeJid();
+                } else if (sender.endsWith("@lid")) {
+                    const Jid = await conn.signalRepository?.lidMapping?.getPNForLID?.(sender);
+                    return Jid.decodeJid();
+                } else return sender;
+            }
+        },
         // conn.pushMessage
         pushMessage: {
             async value(m) {
