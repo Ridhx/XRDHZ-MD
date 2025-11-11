@@ -56,34 +56,49 @@ export function makeWASocket(connectionOptions, options = {}) {
                 return jid.decodeJid();
             }
         },
+        // conn.getNumber
         getNumber: {
-            value(lid) {
-                if (!conn.storeNumber) conn.storeNumber = {};
-                if (!lid || typeof lid !== "string") return "";
-                if (lid.endsWith("@s.whatsapp.net")) return lid.split("@")[0];
-                if (conn.storeNumber[lid]) return conn.storeNumber[lid];
+            value(sender) {
+                if (!conn.storeNumber) {
+                    Object.defineProperty(conn, "storeNumber", {
+                        value: {},
+                        writable: true,
+                        enumerable: false,
+                        configurable: true
+                    });
+                }
+                if (!sender || typeof sender !== "string") return "";
+                if (sender.endsWith("@s.whatsapp.net")) return sender.split("@")[0];
+                if (conn.storeNumber[sender]) return conn.storeNumber[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
-                    let user = chat.metadata.participants.find(p => p.id === lid);
+                    let user = chat.metadata.participants.find(p => p.id === sender);
                     if (user) {
-                        return (conn.storeNumber[lid] = (user?.phoneNumber).split("@")[0]);
+                        return (conn.storeNumber[sender] = (user?.phoneNumber).split("@")[0]);
                     }
                 }
-                return lid;
+                return sender;
             }
         },
         // conn.getLid
         getLid: {
             value(sender) {
-                if (!conn.storeJid) conn.storeJid = {};
+                if (!conn.storeLid) {
+                    Object.defineProperty(conn, "storeLid", {
+                        value: {},
+                        writable: true,
+                        enumerable: false,
+                        configurable: true
+                    });
+                }
                 if (!sender || typeof sender !== "string") return "";
                 if (!sender.endsWith("@s.whatsapp.net") && sender.endsWith("@lid")) return sender.decodeJid();
-                if (conn.storeJid[sender]) return conn.storeJid[sender];
+                if (conn.storeLid[sender]) return conn.storeLid[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
                     let user = chat.metadata.participants.find(p => p.phoneNumber === sender);
                     if (user) {
-                        return (conn.storeJid[sender] = (user?.id).decodeJid());
+                        return (conn.storeLid[sender] = (user?.id).decodeJid());
                     }
                 }
                 return sender;
