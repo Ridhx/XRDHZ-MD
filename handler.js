@@ -24,12 +24,11 @@ export async function handler(chatUpdate) {
         m = (await smsg(this, m)) || m;
         if (!conn.storeMentions) conn.storeMentions = {};
         if (m?.msg?.contextInfo?.mentionedJid?.length) {
-            const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getJid(jid)))];
+            const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getLid(jid)))];
             conn.storeMentions[m.id] = jidMentions;
         }
         if (m.isBaileys) return;
-        if (m.sender.endsWith("@broadcast") || m.sender.endsWith("@newsletter") || m.sender.endsWith("@lid"))
-            return;
+        if (m.sender.endsWith("@broadcast") || m.sender.endsWith("@newsletter")) return;
         try {
             if (global.db.data == null) await global.loadDatabase();
             let user = global.db.data.users[m.sender];
@@ -122,8 +121,9 @@ export async function handler(chatUpdate) {
 
         if (typeof m.text !== "string") m.text = "";
         const isROwner = [conn.decodeJid(global.conn.user.id), ...global.owner]
-            .map(v => v.replace(/[^0-9]/g, "") + "@s.whatsapp.net")
+            .map(v => conn.getLid(v.replace(/[^0-9]/g, "") + "@s.whatsapp.net"))
             .includes(m.sender);
+
         const isOwner = isROwner || m.fromMe;
 
         let usedPrefix;
@@ -132,16 +132,10 @@ export async function handler(chatUpdate) {
                 ? (conn.chats[m.chat] || {}).metadata || (await this.groupMetadata(m.chat).catch(_ => null))
                 : {}) || {};
         const participants = (m.isGroup ? groupMetadata.participants : []) || [];
-        const user =
-            (m.isGroup
-                ? participants.find(u => conn.getJid(u.id) === m.sender || u.PhoneNumber === m.sender)
-                : {}) || {};
-        const bot =
-            (m.isGroup
-                ? participants.find(
-                      u => conn.getJid(u.id) === this.user.jid || u.PhoneNumber === this.user.jid
-                  )
-                : {}) || {};
+        const user = m.isGroup ? participants.find(u => u.id === m.sender) : {};
+        const bot = m.isGroup
+            ? participants.find(u => u.id === conn.getLid(conn.decodeJid(global.conn.user.id)))
+            : {};
         const isRAdmin = user?.admin === "superadmin" || false;
         const isAdmin = isRAdmin || user?.admin === "admin" || false;
         const isBotAdmin = bot?.admin || false;
@@ -316,6 +310,7 @@ export async function handler(chatUpdate) {
             }
         }
     } catch (error) {
+        console.log(error);
         global.reloadHandler(true);
     } finally {
         if (global.autoRead || global.db.data.settings[conn.user.jid].autoread) {
@@ -343,7 +338,7 @@ export async function participantsUpdate({ id, participants, action }) {
             if (chat.sambutan) {
                 let groupMetadata = (await this.groupMetadata(id)) || (conn.chats[id] || {})?.metadata;
                 for (let user of participants) {
-                    const rawJid = (await conn.getJid(user?.id || user?.phoneNumber)) || user.id;
+                    const rawJid = (await conn.getLid(user?.id || user?.phoneNumber)) || user.id;
                     message = (
                         action === "add"
                             ? (chat.sWelcome || conn.sWelcome || "Selamat Datang @user")
@@ -373,7 +368,7 @@ export async function participantsUpdate({ id, participants, action }) {
         case "promote":
         case "demote":
             const rawJid =
-                (await conn.getJid(participants[0]?.id || participants[0]?.phoneNumber)) ||
+                (await conn.getLid(participants[0]?.id || participants[0]?.phoneNumber)) ||
                 participants[0].id;
             message = (
                 action === "promote"
@@ -410,7 +405,7 @@ export async function groupsUpdate(groupsUpdate) {
         const chat = global.db.data?.chats[id];
         if (!chat?.detect) continue;
 
-        const user = await conn.getJid(groupUpdate.author);
+        const user = await conn.getLid(groupUpdate.author);
         if (groupUpdate.desc)
             text = (chat?.sDesc || "Deskripsi group diganti oleh @user\n\n@desc")
                 .replace("@user", `@${user.split("@")[0]}`)
