@@ -9,25 +9,31 @@ import { fileURLToPath } from "url";
 import moment from "moment-timezone";
 
 // ===== CONFIG =====
-global.owner = ["6285751561624"];
-global.nomorown = "6285751561624";
+global.owner = ["6281283516246", "6285751561624"];
 
-global.nomorbot = "6287825020012";
-global.namabot = "XRDHZ-MD";
+global.info = {
+    nomorbot: "0",
+    namabot: "XRDHZ-MD",
+    nomorowner: "6285751561624",
+    namaowner: "Lil Lil Bahlil"
+}
 
 // ===== THUMBNAIL =====
 global.thum = "https://qu.ax/NvoLP.jpg";
 
 // ===== OPTIONS =====
 global.autoRead = true; // OPSIONAL
+global.stage = {
+    wait: "*Memproses permintaan!!*",
+    error: "*Gagal Memproses permintaan*"
+}
 
 // ===== LINK ====
 global.lgh = "https://github.com/Ridhx/XRDHZ-MD"; // Github
 global.lwa = "https://wa.me/6285751561624"; // Whatsapp
 global.lig = ""; // Instagram
 global.lgc = ""; // Group Chat Whatsapp
-global.lch = "https://whatsapp.com/channel/0029VaXLKZUBvvsj6Vtf9C09"; // Channels Whatsapp 
-
+global.lch = ""; // Channels Whatsapp 
 let file = fileURLToPath(import.meta.url);
 watchFile(file, async () => {
     unwatchFile(file);
