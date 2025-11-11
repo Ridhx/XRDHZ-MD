@@ -91,17 +91,25 @@ export function makeWASocket(connectionOptions, options = {}) {
                         configurable: true
                     });
                 }
+
                 if (!sender || typeof sender !== "string") return "";
-                if (!sender.endsWith("@s.whatsapp.net") && sender.endsWith("@lid")) return sender.decodeJid();
-                if (conn.storeLid[sender]) return conn.storeLid[sender];
-                for (let chat of Object.values(conn.chats)) {
-                    if (!chat.metadata?.participants) continue;
-                    let user = chat.metadata.participants.find(p => p.phoneNumber === sender);
-                    if (user) {
-                        return (conn.storeLid[sender] = (user?.id).decodeJid());
+                const decoded = sender.decodeJid();
+                if (conn.storeLid[decoded]) return conn.storeLid[decoded];
+                if (sender.endsWith("@lid")) return decoded;
+
+                if (sender.endsWith("@s.whatsapp.net")) {
+                    const lid = conn.signalRepository?.lidMapping?.getLIDForPN?.(decoded);
+                    if (lid) return (conn.storeLid[decoded] = conn.decodeJid(lid));
+                }
+                for (let chat of Object.values(conn.chats || {})) {
+                    const participants = chat.metadata?.participants;
+                    if (!participants) continue;
+                    const user = participants.find(p => p.phoneNumber === decoded);
+                    if (user?.id) {
+                        return (conn.storeLid[decoded] = user.id.decodeJid());
                     }
                 }
-                return sender;
+                return decoded;
             }
         },
         // conn.pushMessage
