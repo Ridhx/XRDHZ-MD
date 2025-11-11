@@ -56,22 +56,34 @@ export function makeWASocket(connectionOptions, options = {}) {
                 return jid.decodeJid();
             }
         },
-        // conn.getJid
-        getJid: {
-            value(sender) {
-                if (!conn.storeLid) conn.storeLid = {};
-                if (!sender || typeof sender !== "string") return "";
-                if (!sender.endsWith("@lid") && sender.endsWith("@s.whatsapp.net")) return sender.decodeJid();
-                if (conn.storeLid[sender]) return conn.storeLid[sender];
+        getNumber: {
+            value(lid) {
+                if (!conn.storeNumber) conn.storeNumber = {};
+                if (!lid || typeof lid !== "string") return "";
+                if (lid.endsWith("@s.whatsapp.net")) return lid.split("@")[0];
+                if (conn.storeNumber[lid]) return conn.storeNumber[lid];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
-                    let user = chat.metadata.participants.find(p => p.id === sender || p.lid === sender);
+                    let user = chat.metadata.participants.find(p => p.id === lid);
                     if (user) {
-                        return (conn.storeLid[sender] = (
-                            user?.phoneNumber ||
-                            user?.jid ||
-                            user?.id
-                        ).decodeJid());
+                        return (conn.storeNumber[lid] = (user?.phoneNumber).split("@")[0]);
+                    }
+                }
+                return lid;
+            }
+        },
+        // conn.getLid
+        getLid: {
+            value(sender) {
+                if (!conn.storeJid) conn.storeJid = {};
+                if (!sender || typeof sender !== "string") return "";
+                if (!sender.endsWith("@s.whatsapp.net") && sender.endsWith("@lid")) return sender.decodeJid();
+                if (conn.storeJid[sender]) return conn.storeJid[sender];
+                for (let chat of Object.values(conn.chats)) {
+                    if (!chat.metadata?.participants) continue;
+                    let user = chat.metadata.participants.find(p => p.phoneNumber === sender);
+                    if (user) {
+                        return (conn.storeJid[sender] = (user?.id).decodeJid());
                     }
                 }
                 return sender;
@@ -573,9 +585,9 @@ export function makeWASocket(connectionOptions, options = {}) {
                     const pn = parsePhoneNumber(`+${raw}`);
 
                     if (pn.valid) {
-                        mentions.push(`${raw}@s.whatsapp.net`);
+                        mentions.push(conn.getLid(`${raw}@s.whatsapp.net`));
                     } else if (raw.length >= 13 && !raw.startsWith("1203")) {
-                        mentions.push(conn.getJid(`${raw}@lid`));
+                        mentions.push(`${raw}@lid`);
                     }
                 }
 
@@ -929,12 +941,11 @@ export async function smsg(conn, m, hasParent) {
         },
         sender: {
             get() {
-                // Ambil jika participant jid saja (Uji Coba)
                 const participant = m.key.participant;
                 const participantAlt = m.key.participantAlt;
                 const remoteJid = m.key.remoteJid;
                 const remoteJidAlt = m.key.remoteJidAlt;
-                return conn?.getJid(participant || participantAlt || remoteJid || remoteJidAlt);
+                return conn?.getLid(participant || participantAlt || remoteJid || remoteJidAlt);
             },
             enumerable: true
         },
@@ -1019,7 +1030,7 @@ export async function smsg(conn, m, hasParent) {
             get() {
                 let raw = m.msg?.contextInfo?.mentionedJid || [];
                 let raws = raw.length > 0 ? raw : m.text ? conn.parseMention(m.text) : [];
-                return raws.map(Jid => conn.getJid(Jid));
+                return raws.map(Jid => conn.getLid(Jid));
             },
             enumerable: true
         },
@@ -1109,9 +1120,8 @@ export async function smsg(conn, m, hasParent) {
                         },
                         sender: {
                             get() {
-                                // Ambil jika participant jid saja (Uji Coba)
                                 const rawJid = contextInfo.participant || "";
-                                return conn?.getJid(rawJid);
+                                return conn?.getLid(rawJid);
                             },
                             enumerable: true
                         },
@@ -1134,7 +1144,7 @@ export async function smsg(conn, m, hasParent) {
                                 let raw = conn?.storeMentions[this.id] || [];
                                 let raws =
                                     raw.length > 0 ? raw : this.text ? conn.parseMention(this.text) : [];
-                                return raws.map(Jid => conn.getJid(Jid));
+                                return raws.map(Jid => conn.getLid(Jid));
                             },
                             enumerable: true
                         },
