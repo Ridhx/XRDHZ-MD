@@ -8,6 +8,7 @@ export default async function (m, conn = { user: {} }) {
     if (m.fromMe) return;
 
     if (
+        !m ||
         !m.message ||
         m.message.protocolMessage ||
         m.message.senderKeyDistributionMessage ||
@@ -15,13 +16,12 @@ export default async function (m, conn = { user: {} }) {
         m.mtype === "senderKeyDistributionMessage"
     )
         return;
-
+    if (!m.sender) return;
     const _name = m.pushName ? m.pushName : "unknown";
     const _chat = m.chat.endsWith("@g.us") ? m.chat : "~Private Chat";
     const sender = m.sender
         ? await parsePhoneNumber("+" + conn.getNumber(m.sender))?.number?.international
         : "unknown";
-
     let user = global.db.data?.users[m.sender];
     let filesize =
         (m.msg
@@ -46,7 +46,7 @@ ${chalk.white(" » NAME:")} ${chalk.blueBright("%s")}
 ${chalk.white(" » DATE:")} ${chalk.gray("%s")}
 ${chalk.white(" » SEND TO:")} ${chalk.green("%s")}
 ${chalk.white(" » MTYPE:")} ${chalk.yellow("%s")} ${chalk.red("[%s %sB]")}`.trim(),
-        global.namabot,
+        global.info.namabot,
         sender,
         _name,
         (m.messageTimestamp
