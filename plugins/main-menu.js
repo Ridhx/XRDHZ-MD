@@ -155,7 +155,7 @@ let handler = async (m, { conn, usedPrefix, command, __dirname, text }) => {
             contextInfo: {
                 mentionedJid: [m.sender],
                 externalAdReply: {
-                    title: global.namabot + ` © ` + year,
+                    title: global.info.namabot + ` © ` + year,
                     body: `Server Uptime: ${uptime}`,
                     thumbnailUrl: global.thum,
                     sourceUrl: global.lgc,
