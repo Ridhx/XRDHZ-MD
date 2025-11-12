@@ -7,6 +7,7 @@ import "./settings.js";
 import { smsg } from "./function/simple.js";
 import { fileURLToPath } from "url";
 import path from "path";
+import { format } from "util"
 import { unwatchFile, watchFile, readFileSync } from "fs";
 import chalk from "chalk";
 
@@ -101,15 +102,17 @@ export async function handler(chatUpdate) {
                     };
             }
 
-            let setting = global.db.data.settings[conn.user.lid];
-            if (typeof setting !== "object") global.db.data.settings[conn.user.lid] = {};
+            let setting = global.db.data.settings[(conn.user.lid).decodeJid()];
+            if (typeof setting !== "object") global.db.data.settings[(conn.user.lid).decodeJid()] = {};
             if (setting) {
+                if (!("chatMode" in setting)) setting.chatMode = "";
                 if (!("antispam" in setting)) setting.antispam = true;
                 if (!("autoread" in setting)) setting.autoread = true;
                 if (!("autobackup" in setting)) setting.autobackup = true;
                 if (!isNumber(setting.backupDate)) setting.backupDate = -1;
             } else
-                global.db.data.settings[conn.user.lid] = {
+                global.db.data.settings[(conn.user.lid).decodeJid()] = {
+                    chatMode: "",
                     antispam: true,
                     autoread: true,
                     autobackup: true,
@@ -141,10 +144,15 @@ export async function handler(chatUpdate) {
         const isBotAdmin = bot?.admin || false;
 
         const isRegister = global.db.data?.users[m.sender]?.register === true;
-        const isPremium = isROwner || global.db.data?.users[m.sender]?.premium === true;
+        const isPremium = global.db.data?.users[m.sender]?.premium === true;
         const isBannned = global.db.data?.users[m.sender]?.banned === true;
         const isMuted = m.isGroup && global.db.data?.chats[m.chat]?.mute === true;
         const isSewa = m.isGroup && global.db.data?.chats[m.chat]?.sewa === true;
+        const chatMode = global.db.data?.settings[(conn?.user.lid).decodeJid()]?.chatMode;
+
+        if ((chatMode === "pconly" || opts["pconly"]) && !isPremium && !isOwner && m.isGroup) return;
+        if ((chatMode === "gconly" || opts["gconly"]) && !isPremium && !isOwner && !m.isGroup) return;
+        if ((chatMode === "sewaonly" || opts["sewaonly"]) && !isPremium && !isOwner && !isSewa && m.isGroup) return
 
         const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins");
         for (let name in global.plugins) {
@@ -221,6 +229,7 @@ export async function handler(chatUpdate) {
                 m.plugin = name;
 
                 if (isMuted && (!isROwner || !isAdmin)) return;
+                if (isBannned && (!isROwner || !isOwner)) return;
 
                 if (plugin.rowner && plugin.owner && !(isROwner || isOwner)) {
                     global.dFail("owner", m, this);
@@ -295,8 +304,21 @@ export async function handler(chatUpdate) {
                 };
                 try {
                     await plugin.call(this, m, extra);
-                } catch (error) {
-                    console.log(error);
+                } catch (e) {
+                    console.log(e);
+                    const text = format(e);
+                    if (e.name) {
+                     const own = conn.getLid(global.owner[0] + "@s.whatsapp.net");
+                     if (own) {
+                         let msg = `*『 ERROR MESSAGE 』*\n`;
+                         msg += `*📂 PLUGIN :* ${m.plugin}\n`;
+                         msg += `*👤 SENDER :* ${m.sender}\n`;
+                         msg += `*📄 CHAT :* ${m.chat}\n`;
+                         msg += `*📥 COMMAND :* ${usedPrefix + command}\n`;
+                         msg += `*🔒 ERROR :*\n${text}`;
+                         await conn.reply(own, msg);
+                     }
+                    }
                 } finally {
                     if (typeof plugin.after === "function") {
                         try {
@@ -312,9 +334,8 @@ export async function handler(chatUpdate) {
     } catch (error) {
         console.log(error);
     } finally {
-        if (global.autoRead || global.db.data.settings[conn.user.lid].autoread) {
-            await conn.readMessages([m.key]);
-        }
+        if (global.autoRead || global.db.data.settings[(conn.user.lid).decodeJid()].autoread) await conn.readMessages([m.key]);
+        if (Object.keys(conn?.storeMentions).length >= 20) delete conn.storeMentions;
         try {
             await printMessages(m, this);
         } catch (e) {
