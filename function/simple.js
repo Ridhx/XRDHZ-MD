@@ -81,6 +81,8 @@ export function makeWASocket(connectionOptions, options = {}) {
             value(sender) {
                 if (!sender || typeof sender !== "string") return "";
                 if (sender.endsWith("@s.whatsapp.net")) return sender.split("@")[0];
+
+                if (!conn.storeNumber) conn.storeNumber = {}
                 if (conn.storeNumber[sender]) return conn.storeNumber[sender];
                 for (let chat of Object.values(conn.chats)) {
                     if (!chat.metadata?.participants) continue;
@@ -97,6 +99,8 @@ export function makeWASocket(connectionOptions, options = {}) {
             value(sender) {
                 if (!sender || typeof sender !== "string") return "";
                 const decoded = sender.decodeJid();
+
+                if (!conn.storeLid) conn.storeLid = {}
                 if (conn.storeLid[decoded]) return conn.storeLid[decoded];
                 if (sender.endsWith("@lid")) return decoded;
 
