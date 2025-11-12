@@ -11,7 +11,6 @@ let handler = async (m, {
 	text
 }) => {
 	if (global.conn.user.jid != conn.user.jid) return
-	if (global.owner.some(number => m.sender.includes(number)) || m.fromMe) {
 		m.reply('Eksekusi...')
 		let o
 		try {
@@ -26,9 +25,6 @@ let handler = async (m, {
 			if (stdout.trim()) m.reply(stdout)
 			if (stderr.trim()) m.reply(stderr)
 		}
-	} else {
-		global.dFail("rowner", m, conn);
-	}
 }
 handler.help = ['$$ [Exec]']
 handler.tags = ['owner']
