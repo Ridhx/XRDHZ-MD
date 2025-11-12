@@ -17,13 +17,8 @@ import { fileTypeFromBuffer } from "file-type";
 import { parsePhoneNumber } from "awesome-phonenumber";
 import { watchFile, unwatchFile } from "fs";
 import { fileURLToPath } from "url";
-import { toAudio } from './converter.js'
-import {
-	imageToWebp,
-	videoToWebp,
-	writeExifImg,
-	writeExifVid
-} from './exif.js';
+import { toAudio } from "./converter.js";
+import { imageToWebp, videoToWebp, writeExifImg, writeExifVid } from "./exif.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -59,17 +54,20 @@ export function makeWASocket(connectionOptions, options = {}) {
         // conn.storeLid
         storeLid: {
             value: {},
-            writable: true
+            writable: true,
+            configurable: true
         },
         // conn.storeNumber
         storeNumber: {
             value: {},
-            writable: true
+            writable: true,
+            configurable: true
         },
         // conn.storeMentions
         storeMentions: {
             value: {},
-            writable: true
+            writable: true,
+            configurable: true
         },
         // conn.decodeJid
         decodeJid: {
@@ -321,53 +319,77 @@ export function makeWASocket(connectionOptions, options = {}) {
             }
         },
         // conn.sendStickerImage
-		sendStickerImage: {
-			async value(jid, path, quoted, options = {}) {
-				let buff = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,` [1], 'base64') : /^https?:\/\//.test(path) ? await (await fetch(path)).buffer() : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
-				let sticker, buffer 
-				if (options && (options.packname || options.author)) {
-					buffer = await writeExifImg(buff, options) 
-					sticker = {
-						url: buffer
-					} 
-				} else {
-					buffer = await imageToWebp(buff) 
-					sticker = buffer 
-				}
+        sendStickerImage: {
+            async value(jid, path, quoted, options = {}) {
+                let buff = Buffer.isBuffer(path)
+                    ? path
+                    : /^data:.*?\/.*?;base64,/i.test(path)
+                    ? Buffer.from(path.split`,`[1], "base64")
+                    : /^https?:\/\//.test(path)
+                    ? await (await fetch(path)).buffer()
+                    : fs.existsSync(path)
+                    ? fs.readFileSync(path)
+                    : Buffer.alloc(0);
+                let sticker, buffer;
+                if (options && (options.packname || options.author)) {
+                    buffer = await writeExifImg(buff, options);
+                    sticker = {
+                        url: buffer
+                    };
+                } else {
+                    buffer = await imageToWebp(buff);
+                    sticker = buffer;
+                }
 
-				await conn.sendMessage(jid, {
-					sticker: sticker,
-					...options
-				}, {
-					quoted
-				})
-				return buffer
-			}
-		},
-		// conn.sendStickerVideo
-		sendStickerVideo: {
-			async value(jid, path, quoted, options = {}) {
-				let buff = Buffer.isBuffer(path) ? path : /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split`,` [1], 'base64') : /^https?:\/\//.test(path) ? await getBuffer(path) : fs.existsSync(path) ? fs.readFileSync(path) : Buffer.alloc(0)
-				let sticker, buffer 
-				if (options && (options.packname || options.author)) {
-					buffer = await writeExifVid(buff, options) 
-					sticker = {
-						url: buffer
-					} 
-				} else {
-					buffer = await videoToWebp(buff)
-					sticker = buffer 
-				}
+                await conn.sendMessage(
+                    jid,
+                    {
+                        sticker: sticker,
+                        ...options
+                    },
+                    {
+                        quoted
+                    }
+                );
+                return buffer;
+            }
+        },
+        // conn.sendStickerVideo
+        sendStickerVideo: {
+            async value(jid, path, quoted, options = {}) {
+                let buff = Buffer.isBuffer(path)
+                    ? path
+                    : /^data:.*?\/.*?;base64,/i.test(path)
+                    ? Buffer.from(path.split`,`[1], "base64")
+                    : /^https?:\/\//.test(path)
+                    ? await getBuffer(path)
+                    : fs.existsSync(path)
+                    ? fs.readFileSync(path)
+                    : Buffer.alloc(0);
+                let sticker, buffer;
+                if (options && (options.packname || options.author)) {
+                    buffer = await writeExifVid(buff, options);
+                    sticker = {
+                        url: buffer
+                    };
+                } else {
+                    buffer = await videoToWebp(buff);
+                    sticker = buffer;
+                }
 
-				await conn.sendMessage(jid, {
-					sticker: sticker,
-					...options
-				}, {
-					quoted
-				})
-				return buffer
-			}
-		},
+                await conn.sendMessage(
+                    jid,
+                    {
+                        sticker: sticker,
+                        ...options
+                    },
+                    {
+                        quoted
+                    }
+                );
+                return buffer;
+            }
+        },
         // conn.sendFile
         sendFile: {
             /**
