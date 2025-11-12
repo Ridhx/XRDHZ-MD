@@ -119,9 +119,9 @@ export async function handler(chatUpdate) {
         }
 
         if (typeof m.text !== "string") m.text = "";
-        const isROwner = [conn.decodeJid(global.conn.user.lid), ...global.owner]
+        const isROwner = ([...global.owner]
             .map(v => conn.getLid(v.replace(/[^0-9]/g, "") + "@s.whatsapp.net"))
-            .includes(m.sender);
+            || conn.decodeJid(global.conn.user.lid)).includes(m.sender);
 
         const isOwner = isROwner || m.fromMe;
 
