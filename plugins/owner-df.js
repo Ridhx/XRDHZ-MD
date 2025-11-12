@@ -3,14 +3,14 @@ import { readdirSync, unlinkSync, existsSync } from 'fs'
 
 let handler = async (m, { conn, usedPrefix, command, args }) => {
     try {
-        const featuresDir = join(process.cwd(), 'features')
+        const featuresDir = join(process.cwd(), 'plugins')
         let ar1 = []
         
         try {
             const files = readdirSync(featuresDir)
             ar1 = files.filter(file => file.endsWith('.js')).map(file => file.replace('.js', ''))
         } catch (error) {
-            return m.reply(`Error reading features directory: ${error.message}`)
+            return m.reply(`Error reading plugins directory: ${error.message}`)
         }
         
         if (!args[0]) return m.reply(`uhm.. where the text?\n\nexample:\n${usedPrefix + command} info`)
@@ -18,11 +18,11 @@ let handler = async (m, { conn, usedPrefix, command, args }) => {
         
         const file = join(featuresDir, args[0] + '.js')
         if (!existsSync(file)) {
-            return m.reply(`File "features/${args[0]}.js" doesn't exist!`)
+            return m.reply(`File "plugins/${args[0]}.js" doesn't exist!`)
         }
         
         unlinkSync(file)
-        conn.reply(m.chat, `✅ Success deleted "features/${args[0]}.js"`, m)
+        conn.reply(m.chat, `✅ Success deleted "plugins/${args[0]}.js"`, m)
         
     } catch (error) {
         console.error(error)
@@ -30,9 +30,9 @@ let handler = async (m, { conn, usedPrefix, command, args }) => {
     }
 }
 
-handler.help = ['df']
+handler.help = ['dp']
 handler.tags = ['owner']
-handler.command = /^(df)$/i
+handler.command = /^(dp)$/i
 handler.rowner = true
 
 export default handler
