@@ -22,12 +22,12 @@ export async function handler(chatUpdate) {
 
     try {
         m = (await smsg(this, m)) || m;
-        if (m.isBaileys) return;
         if (m.sender.endsWith("@broadcast") || m.sender.endsWith("@newsletter")) return;
         if (m?.msg?.contextInfo?.mentionedJid?.length) {
             const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getLid(jid)))];
             conn.storeMentions[m.id] = jidMentions;
         }
+        if (m.isBaileys) return;
         try {
             if (global.db.data == null) await global.loadDatabase();
             let user = global.db.data.users[m.sender];
