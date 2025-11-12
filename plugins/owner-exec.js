@@ -9,7 +9,6 @@ const require = createRequire(__dirname);
 
 let handler = async (m, _2) => {
     let { conn, usedPrefix, noPrefix, args, groupMetadata } = _2;
-    if (global.owner.some(number => m.sender.includes(number)) || m.fromMe) {
         let _return;
         let _syntax = "";
         let _text = (/^=/.test(usedPrefix) ? "return " : "") + noPrefix;
@@ -65,9 +64,6 @@ let handler = async (m, _2) => {
             conn.reply(m.chat, _syntax + format(_return), m);
             m.exp = old;
         }
-    } else {
-        global.dFail("rowner", m, conn);
-    }
 };
 handler.help = [">", "=>"];
 handler.tags = ["owner"];
