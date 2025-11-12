@@ -178,7 +178,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                                 const qM = {
                                     key: {
                                         remoteJid,
-                                        fromMe: areJidsSameUser(conn.user.jid, remoteJid),
+                                        fromMe: areJidsSameUser((conn?.user.lid).decodeJid(), remoteJid),
                                         id: context.stanzaId,
                                         participant
                                     },
@@ -220,7 +220,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                                 if (!chats.metadata) chats.metadata = metadata;
                             }
                             sender = conn.decodeJid(
-                                (message.key?.fromMe && conn.user.id) ||
+                                (message.key?.fromMe && (conn?.user.lid).decodeJid()) ||
                                     message.participant ||
                                     message.key?.participant ||
                                     chat ||
@@ -235,7 +235,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                         if (["senderKeyDistributionMessage", "messageContextInfo"].includes(mtype)) continue;
                         chats.isChats = true;
                         if (!chats.messages) chats.messages = {};
-                        const fromMe = message.key.fromMe || areJidsSameUser(sender || chat, conn.user.id);
+                        const fromMe = message.key.fromMe || areJidsSameUser(sender || chat, (conn?.user.lid).decodeJid());
                         if (
                             !["protocolMessage"].includes(mtype) &&
                             !fromMe &&
@@ -565,7 +565,7 @@ export function makeWASocket(connectionOptions, options = {}) {
              * @param {*} options
              * @returns
              */
-            value(jid, message, text = "", sender = conn.user.jid, options = {}) {
+            value(jid, message, text = "", sender = (conn?.user.lid).decodeJid(), options = {}) {
                 if (options.mentions && !Array.isArray(options.mentions))
                     options.mentions = [options.mentions];
                 let copy = message.toJSON();
@@ -589,7 +589,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                 if (copy.key.remoteJid.includes("@s.whatsapp.net")) sender = sender || copy.key.remoteJid;
                 else if (copy.key.remoteJid.includes("@broadcast")) sender = sender || copy.key.remoteJid;
                 copy.key.remoteJid = jid;
-                copy.key.fromMe = areJidsSameUser(sender, conn.user.id) || false;
+                copy.key.fromMe = areJidsSameUser(sender, (conn?.user.lid).decodeJid()) || false;
                 return proto.WebMessageInfo.create(copy);
             },
             enumerable: true
@@ -624,7 +624,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                 };
                 m = generateWAMessageFromContent(jid, m, {
                     ...options,
-                    userJid: conn.user.jid
+                    userJid: (conn?.user.lid).decodeJid()
                 });
                 await conn.relayMessage(jid, m.message, {
                     messageId: m.key.id,
@@ -645,10 +645,10 @@ export function makeWASocket(connectionOptions, options = {}) {
              * @param {String} fakeGroupJid
              * @param {String} options
              */
-            value(jid, text = "", fakeJid = this.user.jid, fakeText = "", fakeGroupJid, options) {
+            value(jid, text = "", fakeJid = (conn?.user.lid).decodeJid(), fakeText = "", fakeGroupJid, options) {
                 return conn.reply(jid, text, {
                     key: {
-                        fromMe: areJidsSameUser(fakeJid, conn.user.id),
+                        fromMe: areJidsSameUser(fakeJid, (conn?.user.lid).decodeJid()),
                         participant: fakeJid,
                         ...(fakeGroupJid ? { remoteJid: fakeGroupJid } : {})
                     },
@@ -760,7 +760,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                                   jid,
                                   vname: "WhatsApp"
                               }
-                            : areJidsSameUser(jid, conn.user.id)
+                            : areJidsSameUser(jid, (conn?.user.lid).decodeJid())
                             ? conn.user
                             : conn.chats[jid] || {};
 
@@ -919,7 +919,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                        * @param {String|undefined|null} participant
                        * @param {String} messageID
                        */
-                      value(jid, participant = conn.user.jid, messageID) {
+                      value(jid, participant = (conn?.user.lid).decodeJid(), messageID) {
                           return conn.sendReadReceipt(jid, participant, [messageID]);
                       },
                       enumerable: true
@@ -1062,7 +1062,7 @@ export async function smsg(conn, m, hasParent) {
         },
         fromMe: {
             get() {
-                return m.key?.fromMe || areJidsSameUser(conn?.user.id, m.sender) || false;
+                return m.key?.fromMe || areJidsSameUser((conn?.user.lid).decodeJid(), m.sender) || false;
             },
             enumerable: true
         },
@@ -1238,7 +1238,7 @@ export async function smsg(conn, m, hasParent) {
                         },
                         fromMe: {
                             get() {
-                                return areJidsSameUser(this.sender, conn?.user.jid);
+                                return areJidsSameUser(this.sender, (conn?.user.lid).decodeJid());
                             },
                             enumerable: true
                         },
