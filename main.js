@@ -227,34 +227,34 @@ global.reloadHandler = async function reloadHandler(restartConnection) {
     return true;
 };
 
-global.features = {};
-const featureFolder = global.__dirname(join(__dirname, "./features/index"));
-const featureFilter = filename => /\.js$/.test(filename);
+global.plugins = {};
+const pluginFolder = global.__dirname(join(__dirname, "./plugins/index"));
+const pluginFilter = filename => /\.js$/.test(filename);
 async function featuresInit() {
-    for (let filename of readdirSync(featureFolder).filter(featureFilter)) {
+    for (let filename of readdirSync(pluginFolder).filter(pluginFilter)) {
         try {
-            let files = global.__filename(join(featureFolder, filename));
+            let files = global.__filename(join(pluginFolder, filename));
             const module = await import(files);
-            global.features[filename] = module.default || module;
+            global.plugins[filename] = module.default || module;
         } catch (error) {
             console.log(`${chalk.white.bold(" [INFO]")} ${chalk.green.bold(`FITUR ERROR "${filename}"`)}`);
             console.log(error);
-            delete global.features[filename];
+            delete global.plugins[filename];
         }
     }
 }
 await featuresInit();
 
-global.reloadFeatures = async (_ev, filename) => {
-    if (!featureFilter(filename)) return;
+global.reloadPlugins = async (_ev, filename) => {
+    if (!pluginFilter(filename)) return;
 
-    const dir = global.__filename(join(featureFolder, filename), true);
-    if (filename in global.features) {
+    const dir = global.__filename(join(pluginFolder, filename), true);
+    if (filename in global.plugins) {
         if (existsSync(dir)) {
             console.log(`${chalk.white.bold(" [INFO]")} ${chalk.green.bold(`FITUR DIUPDATE "${filename}"`)}`);
         } else {
             console.log(`${chalk.white.bold(" [INFO]")} ${chalk.red.bold(`FITUR DIHAPUS "${filename}"`)}`);
-            return delete global.features[filename];
+            return delete global.plugins[filename];
         }
     } else
         console.log(`${chalk.white.bold(" [INFO]")} ${chalk.blue.bold(`FITUR DITAMBAHKAN "${filename}"`)}`);
@@ -271,18 +271,18 @@ global.reloadFeatures = async (_ev, filename) => {
 
     try {
         const module = await import(`${global.__filename(dir)}?update=${Date.now()}`);
-        global.features[filename] = module.default || module;
+        global.plugins[filename] = module.default || module;
     } catch (e) {
         console.log(`${chalk.white.bold(" [INFO]")} ${chalk.green.bold(`FITUR ERROR "${filename}"`)}`);
         console.log(format(e));
     } finally {
-        global.features = Object.fromEntries(
-            Object.entries(global.features).sort(([a], [b]) => a.localeCompare(b))
+        global.plugins = Object.fromEntries(
+            Object.entries(global.plugins).sort(([a], [b]) => a.localeCompare(b))
         );
     }
 };
 
-Object.freeze(global.reloadFeatures);
-await watch(featureFolder, global.reloadFeatures);
+Object.freeze(global.reloadPlugins);
+await watch(pluginFolder, global.reloadPlugins);
 await global.reloadHandler();
 await StartPairing();
