@@ -335,7 +335,6 @@ export async function handler(chatUpdate) {
         console.log(error);
     } finally {
         if (global.autoRead || global.db.data.settings[(conn.user.lid).decodeJid()].autoread) await conn.readMessages([m.key]);
-        if (Object.keys(conn?.storeMentions).length >= 20) delete conn.storeMentions;
         try {
             await printMessages(m, this);
         } catch (e) {
