@@ -73,8 +73,8 @@ let handler = async (m, { conn, usedPrefix, command, __dirname, text }) => {
         const serverOS = os.release();
 
         // --- PEMBUATAN MENU ---
-        let help = Object.values(global.features)
-            .filter(plugin => !plugin.disabled)
+        let help = Object.values(global.plugins)
+            .filter(plugin => !plugin.disable)
             .map(plugin => ({
                 help: Array.isArray(plugin.help) ? plugin.help : [plugin.help],
                 tags: Array.isArray(plugin.tags) ? plugin.tags : [plugin.tags],
