@@ -23,16 +23,11 @@ import { Low, JSONFile } from "lowdb";
 import { makeWASocket, protoType } from "./function/simple.js";
 import { requestPairing, connectionUpdate } from "./function/connection.js";
 
-const { Browsers, useMultiFileAuthState, fetchLatestWaWebVersion, makeCacheableSignalKeyStore } =
-    await import("baileys");
+const { Browsers, useMultiFileAuthState, fetchLatestWaWebVersion, makeCacheableSignalKeyStore } = await import("baileys");
 
 protoType(); // Aktifkan protoType :D
 global.__filename = function filename(pathURL = import.meta.url, rmPrefix = platform !== "win32") {
-    return rmPrefix
-        ? /file:\/\/\//.test(pathURL)
-            ? fileURLToPath(pathURL)
-            : pathURL
-        : pathToFileURL(pathURL).toString();
+    return rmPrefix ? (/file:\/\/\//.test(pathURL) ? fileURLToPath(pathURL) : pathURL) : pathToFileURL(pathURL).toString();
 };
 global.__require = function require(dir = import.meta.url) {
     return createRequire(dir);
@@ -79,11 +74,7 @@ const connectionOptions = {
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse());
 global.conn = makeWASocket(connectionOptions, global.opts);
 
-global.prefix = new RegExp(
-    "^[" +
-        (opts.prefix || "‎xzXZ/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.\\-").replace(/[|\\{}()[\]^$+*?.\-\^]/g, "\\$&") +
-        "]"
-);
+global.prefix = new RegExp("^[" + (opts.prefix || "‎xzXZ/i!#$%+£¢€¥^°=¶∆×÷π√✓©®:;?&.\\-").replace(/[|\\{}()[\]^$+*?.\-\^]/g, "\\$&") + "]");
 
 // DATABASE
 global.db = new Low(new JSONFile("database.json"));
@@ -92,10 +83,7 @@ global.loadDatabase = async function loadDatabase() {
     if (global.db.READ)
         return new Promise(resolve =>
             setInterval(function () {
-                !global.db.READ
-                    ? (clearInterval(this),
-                      resolve(global.db.data == null ? global.loadDatabase() : global.db.data))
-                    : null;
+                !global.db.READ ? (clearInterval(this), resolve(global.db.data == null ? global.loadDatabase() : global.db.data)) : null;
             }, 1 * 1000)
         );
     if (global.db.data !== null) return;
@@ -256,8 +244,7 @@ global.reloadPlugins = async (_ev, filename) => {
             console.log(`${chalk.white.bold(" [INFO]")} ${chalk.red.bold(`FITUR DIHAPUS "${filename}"`)}`);
             return delete global.plugins[filename];
         }
-    } else
-        console.log(`${chalk.white.bold(" [INFO]")} ${chalk.blue.bold(`FITUR DITAMBAHKAN "${filename}"`)}`);
+    } else console.log(`${chalk.white.bold(" [INFO]")} ${chalk.blue.bold(`FITUR DITAMBAHKAN "${filename}"`)}`);
 
     const error = syntaxerror(readFileSync(dir), filename, {
         sourceType: "module",
@@ -276,9 +263,7 @@ global.reloadPlugins = async (_ev, filename) => {
         console.log(`${chalk.white.bold(" [INFO]")} ${chalk.green.bold(`FITUR ERROR "${filename}"`)}`);
         console.log(format(e));
     } finally {
-        global.plugins = Object.fromEntries(
-            Object.entries(global.plugins).sort(([a], [b]) => a.localeCompare(b))
-        );
+        global.plugins = Object.fromEntries(Object.entries(global.plugins).sort(([a], [b]) => a.localeCompare(b)));
     }
 };
 
