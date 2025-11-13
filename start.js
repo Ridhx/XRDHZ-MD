@@ -12,9 +12,6 @@ import readline from "readline";
 import { headerLog } from "./function/console.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const sleep = ms => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-};
 
 let isRunning = false;
 const startBot = async () => {
@@ -26,21 +23,15 @@ const startBot = async () => {
     });
 
     p.on("exit", code => {
-        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`BERHENTI DENGAN KODE: ${code}`)}`);
+        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`BERHENTI DENGAN KODE: ${code} ❌`)}`);
         isRunning = false;
-        if (code === 1 || code === 0) {
-            sleep(600);
-            startBot();
-        }
     });
 
     p.on("error", err => {
-        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.red.bold(`ERROR ❌`)}`);
+        console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.red.bold(`BERHENTI KARENA ERROR! ❌`)}`);
         console.error(err);
         p.kill();
         isRunning = false;
-        sleep(600);
-        startBot();
     });
     await headerLog();
 };
