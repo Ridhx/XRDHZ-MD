@@ -22,9 +22,7 @@
 
 ---
 
- **Base Script WhatsApp Tipe ESM Ringan, Cepat, dan Modern.**  
- Dibangun dengan **[Baileys](https://github.com/Whiskeysockets/Baileys)** menggunakan **ECMAScript Modules (ESM)**.  
- Dirancang untuk mudah digunakan, dan dapat dikembangkan lebih lanjut sesuai kebutuhan.
+ **Base Script WhatsApp Tipe ESM Ringan, Cepat, dan Modern.** Dibangun dengan **[Baileys](https://github.com/Whiskeysockets/Baileys)** menggunakan **ECMAScript Modules (ESM)**. Dirancang untuk mudah digunakan, dan dapat dikembangkan lebih lanjut sesuai kebutuhan.
 
 ---
 
