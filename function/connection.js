@@ -48,9 +48,7 @@ export async function requestPairing(conn) {
                 process.exit(1);
             }
         } catch (error) {
-            console.log(
-                `${chalk.white.bold(" [SISTEM]")} ${chalk.red.bold(`GAGAL MEMINTA KODE PAIRING ❌`)}`
-            );
+            console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.red.bold(`GAGAL MEMINTA KODE PAIRING ❌`)}`);
             console.log(error);
             process.exit(1);
         }
@@ -69,8 +67,7 @@ export async function connectionUpdate(update, conn) {
     } catch (e) {
         console.log(e);
     } finally {
-        if (connection === "open")
-            console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.green.bold(`TERHUBUNG ✅`)}`);
+        if (connection === "open") console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.green.bold(`TERHUBUNG ✅`)}`);
 
         if (connection === "close") {
             console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.red.bold(`GAGAL TERHUBUNG ❌`)}`);
@@ -78,17 +75,9 @@ export async function connectionUpdate(update, conn) {
             console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`MENGHUBUNGKAN KEMBALI 🌐`)}`);
         }
 
-        if (receivedPendingNotifications)
-            console.log(
-                `${chalk.white.bold(" [SISTEM]")} ${chalk.yellowBright.bold(`MENUNGGU PESAN MASUK 📥`)}`
-            );
+        if (receivedPendingNotifications) console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellowBright.bold(`MENUNGGU PESAN MASUK 📥`)}`);
 
-        if (
-            lastDisconnnect &&
-            lastDisconnnect.error &&
-            lastDisconnnect.error.output &&
-            lastDisconnnect.error.output.statusCode !== DisconnectReason.loggedOut
-        ) {
+        if (lastDisconnnect && lastDisconnnect.error && lastDisconnnect.error.output && lastDisconnnect.error.output.statusCode !== DisconnectReason.loggedOut) {
             console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold(`MENGHUBUNGKAN KEMBALI 🌐`)}`);
             await global.reloadHandler(true);
         }
