@@ -1,79 +1,80 @@
-<h1 align="center">XRDHZ-MD</h1>
-
 <p align="center">
-  <a href="https://github.com/Ridhx/XRDHZ-MD"><img title="Author" src="https://img.shields.io/badge/AUTHOR-Ridhx-green.svg?style=for-the-badge&logo=github"></a>
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=000000&height=100&section=header&text=XRDHZ-MD&fontColor=000000&fontSize=50&animation=twinkling" />
 </p>
+
+---
 
 <div align="center">
   
-  ![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)
-  ![Baileys](https://img.shields.io/badge/Baileys-Latest-blue.svg)
-  ![Status](https://img.shields.io/badge/Status-Active-brightgreen.svg)
+![Node.js](https://img.shields.io/badge/Node.js-v20%2B-339933?style=flat-square&logo=node.js&logoColor=white)
+![Baileys](https://img.shields.io/badge/Baileys-Latest-25D366?style=flat-square)
+![Type](https://img.shields.io/badge/Type-ESM%20Modules-00d4ff?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
+![License](https://img.shields.io/github/license/Ridhx/XRDHZ-MD?color=00ff88&style=flat-square)
+![Version](https://img.shields.io/github/package-json/v/Ridhx/XRDHZ-MD?color=ff00aa&style=flat-square)
   
 </div>
 
----
-
-Bot WhatsApp sederhana berbasis [Baileys](https://github.com/whiskeysockets/Baileys) dengan struktur modern menggunakan **ECMAScript Modules (ESM)**. Dirancang untuk menjadi ringan, mudah digunakan, dan dapat dikembangkan lebih lanjut sesuai kebutuhan.
-
----
-
-### **📌 Catatan**
-
--   Edit semua info dan konfigurasi di file `settings.js`
--   Wajib menggunakan [node.js](https://nodejs.org) versi 20+
--   Diperlukan basic Javascript dan NodeJS
--   Script ini masih dalam tahap pengembangan dan belum rilis sepenuhnya.
+<p align="center">
+  <img src="https://img.shields.io/github/stars/Ridhx/XRDHZ-MD?style=social" alt="Stars">
+  <img src="https://img.shields.io/github/forks/Ridhx/XRDHZ-MD?style=social" alt="Forks">
+</p>
 
 ---
 
-### **ℹ️ Informasi Script**
-
--   ✅ | **Simple Code**
--   ✅ | **Pairing With Code**
--   ✅ | **Multi-Devices**
--   ✅ | **Plugin Features**
--   ✅ | **ECMAScript Modules**
--   ❌ | **Support Button**
+ **Base Script WhatsApp Tipe ESM Ringan, Cepat, dan Modern.**  
+ Dibangun dengan **[Baileys](https://github.com/Whiskeysockets/Baileys)** menggunakan **ECMAScript Modules (ESM)**.  
+ Dirancang untuk mudah digunakan, dan dapat dikembangkan lebih lanjut sesuai kebutuhan.
 
 ---
 
-### **⚙️ Cara Pakai**
+## 🚀 **Fitur Utama**
 
-```javascript
-git clone https://github.com/Ridhx/XRDHZ-MD.git
-cd xrdhz-md
-npm install
+| Fitur | Status | Keterangan |
+|-|-|-|
+| **Simple Code** | ✅ | Mudah dibaca & dimodifikasi |
+| **Pairing With Code** | ✅ | Tanpa scan QR |
+| **Multi-Device Support** | ✅ | Bisa jalan di HP/PC |
+| **Plugin System** | ✅ | Mudah untuk ditambahkan Fitur Baru |
+| **ESM Modules** | ✅ | Menggunakan Modern JS |
+| **Auto Reconnect** | ✅ | Bisa Online 24/7 |
+| **Database JSON** | ✅ | Penyimpanan data user, grup, dan lainnya |
+| **LID System** | ✅ | Menggunakan LID sebagai pengganti JID |
+| **Button Support** | ❌ | Original Baileys |
+
+---
+
+## 📋 **Instalasi Script**
+
+```bash
+git clone https://github.com/ridhx/XRDHZ-MD.git
+
+cd XRDHZ-MD
+npm i
 npm start
 ```
+---
+
+## 📌 **Info Penting**
+
+*Semua informasi berkaitan dengan script ini akan diupdate melalui channel whatsapp dibawah ini :*
+<p>
+  <a href="https://whatsapp.com/channel/0029VbBJuR342DcjeXf1H412">
+    <img src="https://img.shields.io/badge/Whatsapp Channel-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Channel">
+  </a>
+</p>
 
 ---
 
-### **🫂 Terima Kasih**
+## 🫂 **Kontributor**
 
-<div align="left">
-  <table>
-    <tr>
-      <td align="center">
-        <a href="https://github.com/WhiskeySockets">
-          <img src="https://github.com/WhiskeySockets.png?size=50" width="50" style="border-radius:50%">
-          <br>
-          <strong>WhiskeySockets</strong>
-          <br>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://github.com/XM4ZE">
-          <img src="https://github.com/XM4ZE.png?size=50" width="50" style="border-radius:50%">
-          <br>
-          <strong>XM4ZE</strong>
-          <br>
-        </a>
-      </td>
-    </tr>
-  </table>
-</div>
+*Terima kasih kepada kontributor atas kontribusinya dalam script ini!*
+<p>
+<a href="https://github.com/WhiskeySockets" target="_blank"><img alt="Github" src="https://github.com/WhiskeySockets.png?size=60" /></a>
+<a href="https://github.com/XM4ZE" target="_blank"><img alt="XM4ZE" src="https://github.com/XM4ZE.png?size=60" /></a>
+</p>
 
 ---
 
-#### **Jangan Lupa Untuk Kasih Bintang Ya 🌟**
+## 🌟 **JANGAN LUPA UNTUK KASIH BINTANG YA!** 🌟
+*Satu bintang mu sangat membuat kami semangat untuk melanjutkan project ini :3*
