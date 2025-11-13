@@ -6,22 +6,11 @@ import { unwatchFile, watchFile, readFileSync } from "fs";
 
 export default async function (m, conn = { user: {} }) {
     if (m.fromMe) return;
-
-    if (
-        !m ||
-        !m.message ||
-        m.message.protocolMessage ||
-        m.message.senderKeyDistributionMessage ||
-        m.mtype === "protocolMessage" ||
-        m.mtype === "senderKeyDistributionMessage"
-    )
-        return;
-    if (!m.sender) return;
+    if (!m || !m.message || m.message.protocolMessage || m.message.senderKeyDistributionMessage || m.mtype === "protocolMessage" || m.mtype === "senderKeyDistributionMessage") return;
     const _name = m.pushName ? m.pushName : "unknown";
     const _chat = m.chat.endsWith("@g.us") ? m.chat : "~Private Chat";
-    const sender = m.sender
-        ? await parsePhoneNumber("+" + conn.getNumber(m.sender))?.number?.international
-        : "unknown";
+    const sender = m.sender ? await parsePhoneNumber("+" + conn.getNumber(m.sender))?.number?.international : null;
+    if (!sender || typeof sender !== "string" || sender == undefined) return;
     let user = global.db.data?.users[m.sender];
     let filesize =
         (m.msg
@@ -49,10 +38,7 @@ ${chalk.white(" » MTYPE:")} ${chalk.yellow("%s")} ${chalk.red("[%s %sB]")}`.tri
         global.info.namabot,
         sender,
         _name,
-        (m.messageTimestamp
-            ? new Date(1000 * (m.messageTimestamp.low || m.messageTimestamp))
-            : new Date()
-        ).toLocaleString("id", { timeZone: "Asia/Jakarta" }),
+        (m.messageTimestamp ? new Date(1000 * (m.messageTimestamp.low || m.messageTimestamp)) : new Date()).toLocaleString("id", { timeZone: "Asia/Jakarta" }),
         _chat,
         m.mtype
             ? m.mtype
