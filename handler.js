@@ -7,7 +7,7 @@ import "./settings.js";
 import { smsg } from "./function/simple.js";
 import { fileURLToPath } from "url";
 import path from "path";
-import { format } from "util"
+import { format } from "util";
 import { unwatchFile, watchFile, readFileSync } from "fs";
 import chalk from "chalk";
 
@@ -25,7 +25,7 @@ export async function handler(chatUpdate) {
         m = (await smsg(this, m)) || m;
         if (m.sender.endsWith("@broadcast") || m.sender.endsWith("@newsletter")) return;
         if (m?.msg?.contextInfo?.mentionedJid?.length) {
-            if (!conn.storeMentions) conn.storeMentions = {}
+            if (!conn.storeMentions) conn.storeMentions = {};
             const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getLid(jid)))];
             conn.storeMentions[m.id] = jidMentions;
         }
@@ -102,8 +102,8 @@ export async function handler(chatUpdate) {
                     };
             }
 
-            let setting = global.db.data.settings[(conn.user.lid).decodeJid()];
-            if (typeof setting !== "object") global.db.data.settings[(conn.user.lid).decodeJid()] = {};
+            let setting = global.db.data.settings[conn.user.lid.decodeJid()];
+            if (typeof setting !== "object") global.db.data.settings[conn.user.lid.decodeJid()] = {};
             if (setting) {
                 if (!("chatMode" in setting)) setting.chatMode = "";
                 if (!("antispam" in setting)) setting.antispam = true;
@@ -111,7 +111,7 @@ export async function handler(chatUpdate) {
                 if (!("autobackup" in setting)) setting.autobackup = true;
                 if (!isNumber(setting.backupDate)) setting.backupDate = -1;
             } else
-                global.db.data.settings[(conn.user.lid).decodeJid()] = {
+                global.db.data.settings[conn.user.lid.decodeJid()] = {
                     chatMode: "",
                     antispam: true,
                     autoread: true,
@@ -123,22 +123,15 @@ export async function handler(chatUpdate) {
         }
 
         if (typeof m.text !== "string") m.text = "";
-        const isROwner = ([...global.owner]
-            .map(v => conn.getLid(v.replace(/[^0-9]/g, "") + "@s.whatsapp.net"))
-            || conn.decodeJid(global.conn.user.lid)).includes(m.sender);
+        const isROwner = ([...global.owner].map(v => conn.getLid(v.replace(/[^0-9]/g, "") + "@s.whatsapp.net")) || conn.decodeJid(global.conn.user.lid)).includes(m.sender);
 
         const isOwner = isROwner || m.fromMe;
 
         let usedPrefix;
-        const groupMetadata =
-            (m.isGroup
-                ? (conn.chats[m.chat] || {}).metadata || (await this.groupMetadata(m.chat).catch(_ => null))
-                : {}) || {};
+        const groupMetadata = (m.isGroup ? (conn.chats[m.chat] || {}).metadata || (await this.groupMetadata(m.chat).catch(_ => null)) : {}) || {};
         const participants = (m.isGroup ? groupMetadata.participants : []) || [];
         const user = m.isGroup ? participants.find(u => u.id === m.sender) : {};
-        const bot = m.isGroup
-            ? participants.find(u => u.id === conn.getLid(conn.decodeJid(global.conn.user.lid)))
-            : {};
+        const bot = m.isGroup ? participants.find(u => u.id === conn.getLid(conn.decodeJid(global.conn.user.lid))) : {};
         const isRAdmin = user?.admin === "superadmin" || false;
         const isAdmin = isRAdmin || user?.admin === "admin" || false;
         const isBotAdmin = bot?.admin || false;
@@ -152,7 +145,7 @@ export async function handler(chatUpdate) {
 
         if ((chatMode === "pconly" || opts["pconly"]) && !isPremium && !isOwner && m.isGroup) return;
         if ((chatMode === "gconly" || opts["gconly"]) && !isPremium && !isOwner && !m.isGroup) return;
-        if ((chatMode === "sewaonly" || opts["sewaonly"]) && !isPremium && !isOwner && !isSewa && m.isGroup) return
+        if ((chatMode === "sewaonly" || opts["sewaonly"]) && !isPremium && !isOwner && !isSewa && m.isGroup) return;
 
         const ___dirname = path.join(path.dirname(fileURLToPath(import.meta.url)), "./plugins");
         for (let name in global.plugins) {
@@ -218,9 +211,7 @@ export async function handler(chatUpdate) {
                     plugin.command instanceof RegExp
                         ? plugin.command.test(command)
                         : Array.isArray(plugin.command)
-                        ? plugin.command.some(cmd =>
-                              cmd instanceof RegExp ? cmd.test(command) : cmd === command
-                          )
+                        ? plugin.command.some(cmd => (cmd instanceof RegExp ? cmd.test(command) : cmd === command))
                         : typeof plugin.command === "string"
                         ? plugin.command === command
                         : false;
@@ -308,16 +299,16 @@ export async function handler(chatUpdate) {
                     console.log(e);
                     const text = format(e);
                     if (e.name) {
-                     const own = conn.getLid(global.owner[0] + "@s.whatsapp.net");
-                     if (own) {
-                         let msg = `*『 ERROR MESSAGE 』*\n`;
-                         msg += `*📂 PLUGIN :* ${m.plugin}\n`;
-                         msg += `*👤 SENDER :* ${m.sender}\n`;
-                         msg += `*📄 CHAT :* ${m.chat}\n`;
-                         msg += `*📥 COMMAND :* ${usedPrefix + command}\n`;
-                         msg += `*🔒 ERROR :*\n${text}`;
-                         await conn.reply(own, msg);
-                     }
+                        const own = conn.getLid(global.owner[0] + "@s.whatsapp.net");
+                        if (own) {
+                            let msg = `*『 ERROR MESSAGE 』*\n`;
+                            msg += `*📂 PLUGIN :* ${m.plugin}\n`;
+                            msg += `*👤 SENDER :* ${m.sender}\n`;
+                            msg += `*📄 CHAT :* ${m.chat}\n`;
+                            msg += `*📥 COMMAND :* ${usedPrefix + command}\n`;
+                            msg += `*🔒 ERROR :*\n${text}`;
+                            await conn.reply(own, msg);
+                        }
                     }
                 } finally {
                     if (typeof plugin.after === "function") {
@@ -334,7 +325,7 @@ export async function handler(chatUpdate) {
     } catch (error) {
         console.log(error);
     } finally {
-        if (global.autoRead || global.db.data.settings[(conn.user.lid).decodeJid()].autoread) await conn.readMessages([m.key]);
+        if (global.autoRead || global.db.data.settings[conn.user.lid.decodeJid()].autoread) await conn.readMessages([m.key]);
         try {
             await printMessages(m, this);
         } catch (e) {
@@ -348,65 +339,95 @@ export async function handler(chatUpdate) {
  * @param {import('baileys').BaileysEventMap<unknown>['group-participants.update']} groupsUpdate
  */
 export async function participantsUpdate({ id, participants, action }) {
-    if (this.isHandlerInit) return;
-    let chat = global.db.data?.chats[id] || {};
-    let message;
-    switch (action) {
-        case "add":
-        case "remove":
-            if (chat.sambutan) {
-                let groupMetadata = (await this.groupMetadata(id)) || (conn.chats[id] || {})?.metadata;
-                for (let user of participants) {
-                    const rawJid = (await conn.getLid(user?.id || user?.phoneNumber)) || user.id;
-                    message = (
-                        action === "add"
-                            ? (chat.sWelcome || conn.sWelcome || "Selamat Datang @user")
-                                  .replace("@subject", await this.getName(id))
-                                  .replace(
-                                      "@desc",
-                                      groupMetadata.desc
-                                          ? String.fromCharCode(8206).repeat(4001) + groupMetadata.desc
-                                          : ""
-                                  )
-                            : chat.sBye || conn.sBye || "Selamat Tinggal @user"
-                    ).replace("@user", "@" + rawJid.split("@")[0]);
+    try {
+        if (this.isHandlerInit) return;
+        let chat = global.db.data?.chats[id] || {};
 
-                    await this.sendMessage(
-                        id,
-                        {
-                            text: message,
-                            contextInfo: {
-                                mentionedJid: [rawJid]
-                            }
-                        },
-                        { quoted: null }
-                    );
-                }
-            }
-            break;
-        case "promote":
-        case "demote":
-            const rawJid =
-                (await conn.getLid(participants[0]?.id || participants[0]?.phoneNumber)) ||
-                participants[0].id;
-            message = (
-                action === "promote"
-                    ? chat.sPromote || conn.sPromote || "Selamat @user telah menjadi Admin"
-                    : chat.sDemote || conn.sDemote || "@user telah diberhentikan sebagai Admin"
-            ).replace("@user", "@" + rawJid.split("@")[0]);
+        let message;
+        switch (action) {
+            case "add":
+            case "remove":
+                if (chat?.sambutan) {
+                    let groupMetadata = (await this.groupMetadata(id)) || (conn.chats[id] || {})?.metadata || {};
+                    for (let user of participants) {
+                        let lid = (user?.id).decodeJid();
+                        if (!lid) continue;
 
-            await this.sendMessage(
-                id,
-                {
-                    text: message,
-                    contextInfo: {
-                        mentionedJid: [rawJid]
+                        if (lid.endsWith("@s.whatsapp.net")) lid = await conn.getLidPN(lid);
+
+                        let pp;
+                        try {
+                            pp = { url: await conn.profilePictureUrl(lid, "image") };
+                        } catch (e) {
+                            pp = { url: await conn.profilePictureUrl(id, "image") };
+                        }
+
+                        message = (
+                            action === "add"
+                                ? (chat.sWelcome || conn.sWelcome || "Selamat Datang @user")
+                                      .replace("@subject", await this.getName(id))
+                                      .replace("@desc", groupMetadata.desc ? String.fromCharCode(8206).repeat(4001) + groupMetadata?.desc : "")
+                                : chat.sBye || conn.sBye || "Selamat Tinggal @user"
+                        ).replace("@user", "@" + lid.split("@")[0]);
+
+                        // Opsional diatur sesuai keinginan
+                        try {
+                            await this.sendMessage(
+                                id,
+                                {
+                                    image: pp,
+                                    caption: message,
+                                    mimetype: "image/jpeg",
+                                    contextInfo: {
+                                        mentionedJid: [lid]
+                                    }
+                                },
+                                { quoted: null }
+                            );
+                        } catch (e) {
+                            await this.sendMessage(
+                                id,
+                                {
+                                    text: message,
+                                    contextInfo: {
+                                        mentionedJid: [lid]
+                                    }
+                                },
+                                { quoted: null }
+                            );
+                        }
                     }
-                },
-                { quoted: null }
-            );
+                }
+                break;
 
-            break;
+            case "promote":
+            case "demote":
+                if (chat?.detect) {
+                    for (let user of participants) {
+                        let lid = (user?.id).decodeJid();
+                        if (!lid) continue;
+
+                        if (lid.endsWith("@s.whatsapp.net")) lid = await conn.getLidPN(lid);
+                        message = (
+                            action === "promote" ? chat.sPromote || conn.sPromote || "Selamat @user telah menjadi Admin" : chat.sDemote || conn.sDemote || "@user telah diberhentikan sebagai Admin"
+                        ).replace("@user", "@" + lid.split("@")[0]);
+
+                        await this.sendMessage(
+                            id,
+                            {
+                                text: message,
+                                contextInfo: {
+                                    mentionedJid: [lid]
+                                }
+                            },
+                            { quoted: null }
+                        );
+                    }
+                }
+                break;
+        }
+    } catch (e) {
+        console.error(e);
     }
 }
 
@@ -415,32 +436,30 @@ export async function participantsUpdate({ id, participants, action }) {
  * @param {import('baileys').BaileysEventMap<unknown>['groups.update']} groupsUpdate
  */
 export async function groupsUpdate(groupsUpdate) {
-    if (!groupsUpdate) return;
-    for (const groupUpdate of groupsUpdate) {
-        const id = groupUpdate.id;
-        if (!id) continue;
+    try {
+        if (!groupsUpdate) return;
+        for (const groupUpdate of groupsUpdate) {
+            const id = groupUpdate.id;
+            if (!id) continue;
 
-        let text = "";
-        const chat = global.db.data?.chats[id];
-        if (!chat?.detect) continue;
+            let text = "";
+            const chat = global.db.data?.chats[id];
+            if (!chat?.detect) continue;
 
-        const user = groupUpdate?.author ? await conn.getLid(groupUpdate.author) : "";
-        if (groupUpdate.desc && user)
-            text = (chat?.sDesc || "Deskripsi group diganti oleh @user\n\n@desc")
-                .replace("@user", `@${user.split("@")[0]}`)
-                .replace("@desc", groupUpdate.desc);
-        if (groupUpdate.subject && user)
-            text = (chat?.sSubject || "Judul group diganti oleh @user\n\n@subject")
-                .replace("@user", `@${user.split("@")[0]}`)
-                .replace("@subject", groupUpdate.subject);
-        if (groupUpdate.inviteCode && user)
-            text = "Link group diganti oleh @user".replace("@user", `@${user.split("@")[0]}`);
-        if (groupUpdate.icon) text = "Ikon group telah diganti";
-        if (!text) continue;
-        await this.sendMessage(id, {
-            text,
-            mentions: await conn.parseMention(text)
-        });
+            const user = groupUpdate?.author ? await conn.getLid(groupUpdate.author) : "";
+            if (groupUpdate.desc && user) text = (chat?.sDesc || "Deskripsi group diganti oleh @user\n\n@desc").replace("@user", `@${user.split("@")[0]}`).replace("@desc", groupUpdate.desc);
+            if (groupUpdate.subject && user)
+                text = (chat?.sSubject || "Judul group diganti oleh @user\n\n@subject").replace("@user", `@${user.split("@")[0]}`).replace("@subject", groupUpdate.subject);
+            if (groupUpdate.inviteCode && user) text = "Link group diganti oleh @user".replace("@user", `@${user.split("@")[0]}`);
+            if (groupUpdate.icon) text = "Ikon group telah diganti";
+            if (!text) continue;
+            await this.sendMessage(id, {
+                text,
+                mentions: await conn.parseMention(text)
+            });
+        }
+    } catch (e) {
+        console.error(e);
     }
 }
 
@@ -449,9 +468,9 @@ export async function groupsUpdate(groupsUpdate) {
  * @param {import('baileys').BaileysEventMap<unknown>['message.delete']} message
  */
 export async function catchDeleted(message) {
-    if (!message) return;
     try {
-        console.log(message);
+        if (!message) return;
+        // console.log(message);
     } catch (error) {
         console.error(error);
     }
