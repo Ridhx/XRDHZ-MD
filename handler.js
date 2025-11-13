@@ -446,12 +446,14 @@ export async function groupsUpdate(groupsUpdate) {
             const chat = global.db.data?.chats[id];
             if (!chat?.detect) continue;
 
-            const user = groupUpdate?.author ? await conn.getLid(groupUpdate.author) : "";
-            if (groupUpdate.desc && user) text = (chat?.sDesc || "Deskripsi group diganti oleh @user\n\n@desc").replace("@user", `@${user.split("@")[0]}`).replace("@desc", groupUpdate.desc);
+            let user = (groupUpdate?.author).decodeJid();
+            if (user?.endsWith("@s.whatsapp.net")) user = await conn.getLidPN(user);
+
+            if (groupUpdate.desc && user) text = (chat?.sDesc || "*Deskripsi group diganti oleh @user\n\n@desc").replace("@user", `@${user.split("@")[0]}*`).replace("@desc", groupUpdate.desc);
             if (groupUpdate.subject && user)
-                text = (chat?.sSubject || "Judul group diganti oleh @user\n\n@subject").replace("@user", `@${user.split("@")[0]}`).replace("@subject", groupUpdate.subject);
-            if (groupUpdate.inviteCode && user) text = "Link group diganti oleh @user".replace("@user", `@${user.split("@")[0]}`);
-            if (groupUpdate.icon) text = "Ikon group telah diganti";
+                text = (chat?.sSubject || "*Judul group diganti oleh @user\n\n@subject").replace("@user", `@${user.split("@")[0]}*`).replace("@subject", groupUpdate.subject);
+            if (groupUpdate.inviteCode && user) text = "*Link group diganti oleh @user".replace("@user", `@${user.split("@")[0]}*`);
+            if (groupUpdate.icon) text = "*Ikon group telah diganti*";
             if (!text) continue;
             await this.sendMessage(id, {
                 text,
