@@ -44,6 +44,14 @@
 
 ## 📋 **Instalasi Script**
 
+**1. Software yang diperlukan :**
+- [Git](https://git-scm.com)
+- [Node.js](https://nodejs.org/id) (v20+)
+- [ImageMagick](https://imagemagick.org)
+- [FFmpeg](https://ffmpeg.org)
+
+**2. Deploy Script :**
+
 ```bash
 git clone https://github.com/ridhx/XRDHZ-MD.git
 
