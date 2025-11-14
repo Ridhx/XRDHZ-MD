@@ -71,8 +71,9 @@ npm start
 
 *Terima kasih kepada kontributor atas kontribusinya dalam script ini!*
 <p>
-<a href="https://github.com/WhiskeySockets" target="_blank"><img alt="Github" src="https://github.com/WhiskeySockets.png?size=60" /></a>
-<a href="https://github.com/XM4ZE" target="_blank"><img alt="XM4ZE" src="https://github.com/XM4ZE.png?size=60" /></a>
+<a href="https://github.com/WhiskeySockets" target="_blank"><img alt="Bailyes" src="https://github.com/WhiskeySockets.png?size=60" width="50px" /></a>
+<a href="https://github.com/XM4ZE" target="_blank"><img alt="XM4ZE" src="https://github.com/XM4ZE.png?size=60" width="50px" /></a>
+<a href="https://github.com/RavaAchmad" target="_blank"><img alt="Rava" src="https://github.com/RavaAchmad.png?size=60" width="50px" /></a>
 </p>
 
 ---
