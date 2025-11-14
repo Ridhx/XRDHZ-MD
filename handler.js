@@ -124,8 +124,11 @@ export async function handler(chatUpdate) {
 
         if (typeof m.text !== "string") m.text = "";
         const isROwner = ([...global.owner].map(v => conn.getLid(v.replace(/[^0-9]/g, "") + "@s.whatsapp.net")) || conn.decodeJid(global.conn.user.lid)).includes(m.sender);
+        const senderJids = jidNormalizedUser(m.sender);
+        const isROwnercustom = global.owner.map(o => `${o}@s.whatsapp.net`).includes(senderJids);
 
-        const isOwner = isROwner || m.fromMe;
+
+        const isOwner = isROwner || m.fromMe || isROwnercustom;
 
         let usedPrefix;
         const groupMetadata = (m.isGroup ? (conn.chats[m.chat] || {}).metadata || (await this.groupMetadata(m.chat).catch(_ => null)) : {}) || {};
