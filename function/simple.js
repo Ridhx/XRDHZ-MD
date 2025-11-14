@@ -12,13 +12,13 @@ import chalk from "chalk";
 import * as Jimp from "jimp";
 import fetch from "node-fetch";
 
-import {format} from "util";
-import {fileTypeFromBuffer} from "file-type";
-import {parsePhoneNumber} from "awesome-phonenumber";
-import {watchFile, unwatchFile} from "fs";
-import {fileURLToPath} from "url";
-import {toAudio} from "./converter.js";
-import {imageToWebp, videoToWebp, writeExifImg, writeExifVid} from "./exif.js";
+import { format } from "util";
+import { fileTypeFromBuffer } from "file-type";
+import { parsePhoneNumber } from "awesome-phonenumber";
+import { watchFile, unwatchFile } from "fs";
+import { fileURLToPath } from "url";
+import { toAudio } from "./converter.js";
+import { imageToWebp, videoToWebp, writeExifImg, writeExifVid } from "./exif.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -48,7 +48,7 @@ export function makeWASocket(connectionOptions, options = {}) {
    let sock = Object.defineProperties(conn, {
       // conn.chats
       chats: {
-         value: {...(options.chats || {})},
+         value: { ...(options.chats || {}) },
          writable: true
       },
       // conn.storeLid
@@ -102,15 +102,15 @@ export function makeWASocket(connectionOptions, options = {}) {
             const decoded = jidNormalizedUser(sender);
             if (decoded.endsWith("@lid")) return decoded;
             if (decoded && typeof decoded == "string") {
-              if (conn.storeLid[decoded]) return conn.storeLid[decoded];
-              for (let chat of Object.values(conn.chats || {})) {
-                 const participants = chat.metadata?.participants;
-                 if (!participants) continue;
-                 const user = participants.find(p => p.phoneNumber === decoded);
-                 if (user?.id) {
-                    return conn.storeLid[decoded] = jidNormalizedUser(user.id)
-                 }
-              }
+               if (conn.storeLid[decoded]) return conn.storeLid[decoded];
+               for (let chat of Object.values(conn.chats || {})) {
+                  const participants = chat.metadata?.participants;
+                  if (!participants) continue;
+                  const user = participants.find(p => p.phoneNumber === decoded);
+                  if (user?.id) {
+                     return (conn.storeLid[decoded] = jidNormalizedUser(user.id));
+                  }
+               }
             }
             return decoded;
          }
@@ -157,7 +157,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                      if (remoteJid && remoteJid !== "status@broadcast" && quoted) {
                         let qMtype = Object.keys(quoted)[0];
                         if (qMtype == "conversation") {
-                           quoted.extendedTextMessage = {text: quoted[qMtype]};
+                           quoted.extendedTextMessage = { text: quoted[qMtype] };
                            delete quoted.conversation;
                            qMtype = "extendedTextMessage";
                         }
@@ -173,7 +173,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                               participant
                            },
                            message: JSON.parse(JSON.stringify(quoted)),
-                           ...(isGroup ? {participant} : {})
+                           ...(isGroup ? { participant } : {})
                         };
                         let qChats = conn.chats[participant];
                         if (!qChats)
@@ -208,7 +208,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                      sender = conn.decodeJid((message.key?.fromMe && (conn?.user.lid).decodeJid()) || message.participant || message.key?.participant || chat || "");
                      if (sender !== chat) {
                         let chats = conn.chats[sender];
-                        if (!chats) chats = conn.chats[sender] = {id: sender};
+                        if (!chats) chats = conn.chats[sender] = { id: sender };
                         if (!chats.name) chats.name = message.pushName || chats.name || "";
                      }
                   } else if (!chats.name) chats.name = message.pushName || chats.name || "";
@@ -378,15 +378,15 @@ export function makeWASocket(connectionOptions, options = {}) {
           */
          async value(jid, path, filename = "", caption = "", quoted, ptt = false, options = {}) {
             let type = await conn.getFile(path, true);
-            let {res, data: file, filename: pathFile} = type;
+            let { res, data: file, filename: pathFile } = type;
             if ((res && res.status !== 200) || file.length <= 65536) {
                try {
-                  throw {json: JSON.parse(file.toString())};
+                  throw { json: JSON.parse(file.toString()) };
                } catch (e) {
                   if (e.json) throw e.json;
                }
             }
-            let opt = {filename};
+            let opt = { filename };
             if (quoted) opt.quoted = quoted;
             if (!type) options.asDocument = true;
             let mtype = "",
@@ -410,7 +410,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                ...options,
                caption,
                ptt,
-               [mtype]: {url: pathFile},
+               [mtype]: { url: pathFile },
                mimetype,
                fileName: filename || pathFile.split("/").pop()
             };
@@ -419,12 +419,12 @@ export function makeWASocket(connectionOptions, options = {}) {
              */
             let m;
             try {
-               m = await conn.sendMessage(jid, message, {...opt, ...options});
+               m = await conn.sendMessage(jid, message, { ...opt, ...options });
             } catch (e) {
                console.error(e);
                m = null;
             } finally {
-               if (!m) m = await conn.sendMessage(jid, {...message, [mtype]: file}, {...opt, ...options});
+               if (!m) m = await conn.sendMessage(jid, { ...message, [mtype]: file }, { ...opt, ...options });
                file = null; // kosongkan memory :v
                return m;
             }
@@ -472,7 +472,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                })),
                selectableOptionsCount: 1
             };
-            return conn.relayMessage(jid, {pollCreationMessage: pollMessage}, {...options});
+            return conn.relayMessage(jid, { pollCreationMessage: pollMessage }, { ...options });
          }
       },
       // conn.downloadAndSaveMediaMessage
@@ -536,7 +536,7 @@ export function makeWASocket(connectionOptions, options = {}) {
             else if (content.caption) content.caption = text || content.caption;
             else if (content.text) content.text = text || content.text;
             if (typeof content !== "string") {
-               msg[mtype] = {...content, ...options};
+               msg[mtype] = { ...content, ...options };
                msg[mtype].contextInfo = {
                   ...(content.contextInfo || {}),
                   mentionedJid: options.mentions || content.contextInfo?.mentionedJid || []
@@ -583,7 +583,7 @@ export function makeWASocket(connectionOptions, options = {}) {
             });
             await conn.relayMessage(jid, m.message, {
                messageId: m.key.id,
-               additionalAttributes: {...options}
+               additionalAttributes: { ...options }
             });
             return m;
          },
@@ -605,9 +605,9 @@ export function makeWASocket(connectionOptions, options = {}) {
                key: {
                   fromMe: areJidsSameUser(fakeJid, (conn?.user.lid).decodeJid()),
                   participant: fakeJid,
-                  ...(fakeGroupJid ? {remoteJid: fakeGroupJid} : {})
+                  ...(fakeGroupJid ? { remoteJid: fakeGroupJid } : {})
                },
-               message: {conversation: fakeText},
+               message: { conversation: fakeText },
                ...options
             });
          }
@@ -629,7 +629,7 @@ export function makeWASocket(connectionOptions, options = {}) {
             for await (const chunk of stream) {
                buffer = Buffer.concat([buffer, chunk]);
             }
-            if (saveToFile) ({filename} = await conn.getFile(buffer, true));
+            if (saveToFile) ({ filename } = await conn.getFile(buffer, true));
             return saveToFile && fs.existsSync(filename) ? filename : buffer;
          },
          enumerable: true
@@ -673,7 +673,7 @@ export function makeWASocket(connectionOptions, options = {}) {
             let chat = {
                ...(conn.contacts[id] || {}),
                id,
-               ...(isGroup ? {subject: metadata.subject, desc: metadata.desc} : {name})
+               ...(isGroup ? { subject: metadata.subject, desc: metadata.desc } : { name })
             };
             conn.contacts[id] = chat;
             conn.chats[id] = chat;
@@ -743,8 +743,8 @@ export function makeWASocket(connectionOptions, options = {}) {
           */
          value(messageID) {
             return Object.entries(conn.chats)
-               .filter(([_, {messages}]) => typeof messages === "object")
-               .find(([_, {messages}]) => Object.entries(messages).find(([k, v]) => k === messageID || v.key?.id === messageID))?.[1].messages?.[messageID];
+               .filter(([_, { messages }]) => typeof messages === "object")
+               .find(([_, { messages }]) => Object.entries(messages).find(([k, v]) => k === messageID || v.key?.id === messageID))?.[1].messages?.[messageID];
          },
          enumerable: true
       },
@@ -759,15 +759,15 @@ export function makeWASocket(connectionOptions, options = {}) {
             const chat = conn.decodeJid(m.key.remoteJid || m.message?.senderKeyDistributionMessage?.groupId || "");
             if (!chat || chat === "status@broadcast") return;
             const emitGroupUpdate = update => {
-               conn.ev.emit("groups.update", [{id: chat, ...update}]);
+               conn.ev.emit("groups.update", [{ id: chat, ...update }]);
             };
             switch (m.messageStubType) {
                case WAMessageStubType.REVOKE:
                case WAMessageStubType.GROUP_CHANGE_INVITE_LINK:
-                  emitGroupUpdate({revoke: m.messageStubParameters[0]});
+                  emitGroupUpdate({ revoke: m.messageStubParameters[0] });
                   break;
                case WAMessageStubType.GROUP_CHANGE_ICON:
-                  emitGroupUpdate({icon: m.messageStubParameters[0]});
+                  emitGroupUpdate({ icon: m.messageStubParameters[0] });
                   break;
                default: {
                   /*  console.log({
@@ -782,7 +782,7 @@ export function makeWASocket(connectionOptions, options = {}) {
             const isGroup = chat.endsWith("@g.us");
             if (!isGroup) return;
             let chats = conn.chats[chat];
-            if (!chats) chats = conn.chats[chat] = {id: chat};
+            if (!chats) chats = conn.chats[chat] = { id: chat };
             chats.isChats = true;
             const metadata = await conn.groupMetadata(chat).catch(_ => null);
             if (!metadata) return;
@@ -801,7 +801,7 @@ export function makeWASocket(connectionOptions, options = {}) {
             var skirim = await conn.relayMessage(fullMessage.key.remoteJid, fullMessage.message, {
                messageId: fullMessage.key.id
             });
-            conn.ev.emit("messages.upsert", {messages: [fullMessage], type: "append"});
+            conn.ev.emit("messages.upsert", { messages: [fullMessage], type: "append" });
             return skirim;
          }
       },
@@ -833,11 +833,11 @@ export function makeWASocket(connectionOptions, options = {}) {
       // conn.updateProfilePicture
       updateProfilePicture: {
          async value(jid, content) {
-            const {img} = await generateProfilePicture(content);
+            const { img } = await generateProfilePicture(content);
             return conn.query({
                tag: "iq",
-               attrs: {to: jidNormalizedUser(jid), type: "set", xmlns: "w:profile:picture"},
-               content: [{tag: "picture", attrs: {type: "image"}, content: img}]
+               attrs: { to: jidNormalizedUser(jid), type: "set", xmlns: "w:profile:picture" },
+               content: [{ tag: "picture", attrs: { type: "image" }, content: img }]
             });
          },
          enumerable: true
@@ -1321,7 +1321,7 @@ async function generateProfilePicture(mediaUpload) {
    if (Buffer.isBuffer(mediaUpload)) bufferOrFilePath = mediaUpload;
    else if ("url" in mediaUpload) bufferOrFilePath = mediaUpload.url.toString();
    else bufferOrFilePath = await toBuffer(mediaUpload.stream);
-   const {read, MIME_JPEG, AUTO} = await Promise.resolve().then(async () => (await import("jimp")).default);
+   const { read, MIME_JPEG, AUTO } = await Promise.resolve().then(async () => (await import("jimp")).default);
    const jimp = await read(bufferOrFilePath);
    const min = jimp.getWidth();
    const max = jimp.getHeight();
