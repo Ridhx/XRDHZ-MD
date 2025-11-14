@@ -10,7 +10,7 @@ import path from "path";
 import { format } from "util";
 import { unwatchFile, watchFile, readFileSync } from "fs";
 import chalk from "chalk";
-import { jidNormalizedUser } from 'baileys';
+import { jidNormalizedUser } from "baileys";
 
 const isNumber = x => typeof x === "number" && !isNaN(x);
 const printMessages = (await import("./function/print.js")).default;
@@ -31,6 +31,7 @@ export async function handler(chatUpdate) {
             conn.storeMentions[m.id] = jidMentions;
         }
         if (m.isBaileys) return;
+        const decodedBotLid = jidNormalizedUser(conn?.user?.lid) || conn.getLid(jidNormalizedUser(conn?.user?.id)) || "";
         try {
             if (global.db.data == null) await global.loadDatabase();
             let user = global.db.data.users[m.sender];
@@ -103,8 +104,8 @@ export async function handler(chatUpdate) {
                     };
             }
 
-            let setting = global.db.data.settings[conn.user.lid.decodeJid()];
-            if (typeof setting !== "object") global.db.data.settings[conn.user.lid.decodeJid()] = {};
+            let setting = global.db.data.settings[decodedBotLid];
+            if (typeof setting !== "object") global.db.data.settings[decodedBotLid] = {};
             if (setting) {
                 if (!("chatMode" in setting)) setting.chatMode = "";
                 if (!("antispam" in setting)) setting.antispam = true;
@@ -112,7 +113,7 @@ export async function handler(chatUpdate) {
                 if (!("autobackup" in setting)) setting.autobackup = true;
                 if (!isNumber(setting.backupDate)) setting.backupDate = -1;
             } else
-                global.db.data.settings[conn.user.lid.decodeJid()] = {
+                global.db.data.settings[decodedBotLid] = {
                     chatMode: "",
                     antispam: true,
                     autoread: true,
@@ -124,18 +125,16 @@ export async function handler(chatUpdate) {
         }
 
         if (typeof m.text !== "string") m.text = "";
-        const isROwner = ([...global.owner].map(v => conn.getLid(v.replace(/[^0-9]/g, "") + "@s.whatsapp.net")) || conn.decodeJid(global.conn.user.lid)).includes(m.sender);
-        const senderJids = jidNormalizedUser(m.sender);
-        const isROwnercustom = global.owner.map(o => `${o}@s.whatsapp.net`).includes(senderJids);
+        const decodedOwnLid = await Promise.all(global.owner.map(o => conn.getLidPN(`${o.replace(/[^0-9]/g, "")}@s.whatsapp.net`)));
+        const isROwner = ([...decodedOwnLid] || decodedBotLid).includes(m.sender);
 
-
-        const isOwner = isROwner || m.fromMe || isROwnercustom;
+        const isOwner = isROwner || m.fromMe || false;
 
         let usedPrefix;
         const groupMetadata = (m.isGroup ? (conn.chats[m.chat] || {}).metadata || (await this.groupMetadata(m.chat).catch(_ => null)) : {}) || {};
         const participants = (m.isGroup ? groupMetadata.participants : []) || [];
         const user = m.isGroup ? participants.find(u => u.id === m.sender) : {};
-        const bot = m.isGroup ? participants.find(u => u.id === conn.getLid(conn.decodeJid(global.conn.user.lid))) : {};
+        const bot = m.isGroup ? participants.find(u => u.id === decodedBotLid) : {};
         const isRAdmin = user?.admin === "superadmin" || false;
         const isAdmin = isRAdmin || user?.admin === "admin" || false;
         const isBotAdmin = bot?.admin || false;
@@ -145,7 +144,7 @@ export async function handler(chatUpdate) {
         const isBannned = global.db.data?.users[m.sender]?.banned === true;
         const isMuted = m.isGroup && global.db.data?.chats[m.chat]?.mute === true;
         const isSewa = m.isGroup && global.db.data?.chats[m.chat]?.sewa === true;
-        const chatMode = global.db.data?.settings[(conn?.user.lid).decodeJid()]?.chatMode;
+        const chatMode = global.db.data?.settings[decodedBotLid]?.chatMode;
 
         if ((chatMode === "pconly" || opts["pconly"]) && !isPremium && !isOwner && m.isGroup) return;
         if ((chatMode === "gconly" || opts["gconly"]) && !isPremium && !isOwner && !m.isGroup) return;
@@ -303,7 +302,7 @@ export async function handler(chatUpdate) {
                     console.log(e);
                     const text = format(e);
                     if (e.name) {
-                        const own = conn.getLid(global.owner[0] + "@s.whatsapp.net");
+                        const own = decodedOwnLid[0];
                         if (own) {
                             let msg = `*『 ERROR MESSAGE 』*\n`;
                             msg += `*📂 PLUGIN :* ${m.plugin}\n`;
@@ -329,7 +328,7 @@ export async function handler(chatUpdate) {
     } catch (error) {
         console.log(error);
     } finally {
-        if (global.autoRead || global.db.data.settings[conn.user.lid.decodeJid()].autoread) await conn.readMessages([m.key]);
+        if (global.autoRead || global.db.data.settings[decodedBotLid].autoread) await conn.readMessages([m.key]);
         try {
             await printMessages(m, this);
         } catch (e) {
@@ -461,7 +460,7 @@ export async function groupsUpdate(groupsUpdate) {
                 if (!text) continue;
                 await this.sendMessage(id, {
                     text,
-                    mentions: await conn.parseMention(text)
+                    mentions: [user]
                 });
             }
             if (groupUpdate.icon) conn.reply(id, "*Ikon group telah diganti*");
