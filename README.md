@@ -15,11 +15,6 @@
   
 </div>
 
-<p align="center">
-  <img src="https://img.shields.io/github/stars/Ridhx/XRDHZ-MD?style=social" alt="Stars">
-  <img src="https://img.shields.io/github/forks/Ridhx/XRDHZ-MD?style=social" alt="Forks">
-</p>
-
 ---
 
  **Base Script WhatsApp Tipe ESM Ringan, Cepat, dan Modern.** Dibangun dengan **[Baileys](https://github.com/Whiskeysockets/Baileys)** menggunakan **ECMAScript Modules (ESM)**. Dirancang untuk mudah digunakan, dan dapat dikembangkan lebih lanjut sesuai kebutuhan.
