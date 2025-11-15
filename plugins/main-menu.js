@@ -46,7 +46,7 @@ let handler = async (m, { conn, usedPrefix, command, __dirname, text }) => {
         if (!user) return;
 
         let name = `@${m.sender.split('@')[0]}`;
-        let botname = conn.user?.name || global.namebot || 'Default Bot Name';
+        let botname = conn.user?.name || global.info.namabot || 'Default Bot Name';
         let level = user.level || 0;
         let role = user.role || 'Beginner';
         let exp = user.exp || 0;
