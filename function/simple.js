@@ -36,15 +36,20 @@ const {
    jidNormalizedUser,
    generateMessageIDV2
 } = await import("baileys");
-
 /**
  * Fungsi membuat socket ke baileys.
  * @param {Object} connectionOptions
  * @param {Object} options
  * @returns
  */
+
 export function makeWASocket(connectionOptions, options = {}) {
    let conn = _makeWASocket(connectionOptions);
+   if (!conn.storeLid) conn.storeLid = {};
+   if (!conn.storeJid) conn.storeJid = {};
+   if (!conn.groupCache) conn.groupCache = {};
+   if (!conn.storeMentions) conn.storeMentions = {};
+   if (!conn.storeMentions) conn.storeMentions = {};   
    let sock = Object.defineProperties(conn, {
       // conn.chats
       chats: {
@@ -76,6 +81,36 @@ export function makeWASocket(connectionOptions, options = {}) {
             return jid.decodeJid();
          }
       },
+      //conn.getJid
+      getJid: {
+         value(lid) {
+            if (!conn.storeJid) conn.storeJid = {};
+            if (!lid || typeof lid !== "string") return "";
+            
+            const decoded = jidNormalizedUser(lid);
+            
+            // Kalau bukan LID, return langsung
+            if (!decoded.endsWith("@lid")) return decoded;
+            
+            // Check cache
+            if (conn.storeJid[decoded]) return conn.storeJid[decoded];
+            
+            // Cari di chats metadata
+            for (let chat of Object.values(conn.chats || {})) {
+               const participants = chat.metadata?.participants;
+               if (!participants) continue;
+               
+               const user = participants.find(p => jidNormalizedUser(p.id) === decoded);
+               if (user?.phoneNumber) {
+                  const jid = jidNormalizedUser(user.phoneNumber);
+                  conn.syncLidMapping(jid, decoded);
+                  return jid;
+               }
+            }
+            
+            return decoded;
+         }
+      },
       // conn.getNumber
       getNumber: {
          value(sender) {
@@ -94,25 +129,99 @@ export function makeWASocket(connectionOptions, options = {}) {
             return sender;
          }
       },
+      //conn.syncLidMapping
+      syncLidMapping: {
+         value(jid, lid) {
+            if (!jid || !lid) return;
+            
+            // Double check storage exists
+            if (!conn.storeLid) conn.storeLid = {};
+            if (!conn.storeJid) conn.storeJid = {};
+            
+            const normalizedJid = jidNormalizedUser(jid);
+            const normalizedLid = jidNormalizedUser(lid);
+            
+            conn.storeLid[normalizedJid] = normalizedLid;
+            conn.storeJid[normalizedLid] = normalizedJid;
+         }
+      },
       // conn.getLid
       getLid: {
          value(sender) {
             if (!conn.storeLid) conn.storeLid = {};
             if (!sender || typeof sender !== "string") return "";
+            
             const decoded = jidNormalizedUser(sender);
+            
+            // Kalau udah LID, return langsung
             if (decoded.endsWith("@lid")) return decoded;
-            if (decoded && typeof decoded == "string") {
-               if (conn.storeLid[decoded]) return conn.storeLid[decoded];
-               for (let chat of Object.values(conn.chats || {})) {
-                  const participants = chat.metadata?.participants;
-                  if (!participants) continue;
-                  const user = participants.find(p => p.phoneNumber === decoded);
-                  if (user?.id) {
-                     return (conn.storeLid[decoded] = jidNormalizedUser(user.id));
-                  }
+            
+            // Check cache dulu
+            if (conn.storeLid[decoded]) return conn.storeLid[decoded];
+            
+            // Cari di chats metadata
+            for (let chat of Object.values(conn.chats || {})) {
+               const participants = chat.metadata?.participants;
+               if (!participants) continue;
+               
+               const user = participants.find(p => {
+                  const phone = p.phoneNumber?.replace(/\D/g, '');
+                  const decodedPhone = decoded.split('@')[0].replace(/\D/g, '');
+                  return phone === decodedPhone;
+               });
+               
+               if (user?.id) {
+                  const lid = jidNormalizedUser(user.id);
+                  conn.syncLidMapping(decoded, lid);
+                  return lid;
                }
             }
+            
+            // Fallback: return original
             return decoded;
+         }
+},
+      isOwner: {
+         value(sender, ownerNumbers = []) {
+            if (!sender) return false;
+            
+            const decoded = jidNormalizedUser(sender);
+            const isLid = decoded.endsWith("@lid");
+            
+            // Normalize owner numbers
+            const normalizedOwners = ownerNumbers.map(num => {
+               const clean = num.replace(/\D/g, '');
+               return jidNormalizedUser(clean + '@s.whatsapp.net');
+            });
+            
+            // Check direct match (JID)
+            if (normalizedOwners.includes(decoded)) return true;
+            
+            // Kalau sender adalah LID, convert ke JID dulu
+            if (isLid) {
+               const jid = conn.getJid(decoded);
+               if (normalizedOwners.includes(jid)) return true;
+            } else {
+               // Kalau sender adalah JID, convert ke LID juga
+               const lid = conn.getLid(decoded);
+               // Check apakah owner numbers ada yang match dengan LID ini
+               for (let owner of normalizedOwners) {
+                  const ownerLid = conn.getLid(owner);
+                  if (ownerLid === lid) return true;
+               }
+            }
+            
+            return false;
+         }
+      },
+      resolveMention: {
+         value(mention) {
+            const decoded = jidNormalizedUser(mention);
+            return {
+               jid: conn.getJid(decoded),
+               lid: conn.getLid(decoded),
+               original: decoded
+            };
          }
       },
       // conn.getLidPN
