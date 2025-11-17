@@ -7,7 +7,7 @@ import "./settings.js";
 import { smsg } from "./function/simple.js";
 import { fileURLToPath } from "url";
 import path from "path";
-import { format } from "util";
+import { format } from "util"; 
 import { unwatchFile, watchFile, readFileSync } from "fs";
 import chalk from "chalk";
 import { jidNormalizedUser } from "baileys";
@@ -24,14 +24,34 @@ export async function handler(chatUpdate) {
 
     try {
         m = (await smsg(this, m)) || m;
-        if (m.sender.endsWith("@broadcast")) return;
+        if (m.sender.endsWith("@broadcast") || m.sender.endsWith("@newsletter")) return;
+        if (!conn.storeLid) conn.storeLid = {};
+        if (!conn.storeJid) conn.storeJid = {};
+        if (!conn.groupCache) conn.groupCache = {};
+        if (!conn.storeMentions) conn.storeMentions = {};
         if (m?.msg?.contextInfo?.mentionedJid?.length) {
-            if (!conn.storeMentions) conn.storeMentions = {};
             const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getLid(jid)))];
             conn.storeMentions[m.id] = jidMentions;
         }
         if (m.isBaileys) return;
-        const decodedBotLid = jidNormalizedUser(conn?.user?.lid) || conn.getLid(jidNormalizedUser(conn?.user?.id)) || "";
+
+        const botJid = jidNormalizedUser(conn?.user?.id) || "";
+        const botLid = conn?.user?.lid ? jidNormalizedUser(conn.user.lid) : (botJid ? conn.getLid(botJid) : "");
+        
+        if (botJid && botLid) {
+            conn.syncLidMapping(botJid, botLid);
+        }
+        
+        const senderJid = m.sender || "";
+        const senderLid = senderJid ? conn.getLid(senderJid) : "";
+        
+        if (senderJid && senderLid && senderJid !== senderLid) {
+            conn.syncLidMapping(senderJid, senderLid);
+        }
+        
+        // Use botLid for database key
+        const decodedBotLid = botLid || jidNormalizedUser(conn?.user?.lid) || "";
+
         try {
             if (global.db.data == null) await global.loadDatabase();
             let user = global.db.data.users[m.sender];
@@ -75,6 +95,7 @@ export async function handler(chatUpdate) {
                 let chat = global.db.data.chats[m.chat];
                 if (typeof chat !== "object") global.db.data.chats[m.chat] = {};
                 if (chat) {
+                    if (!("self" in chat)) chat.self = false; 
                     if (!("antispam" in chat)) chat.antispam = false;
                     if (!("antilink" in chat)) chat.antilink = false;
                     if (!("antivirtex" in chat)) chat.antivirtex = false;
@@ -89,6 +110,7 @@ export async function handler(chatUpdate) {
                     if (!isNumber(chat.sewaDate)) chat.sewaDate = -1;
                 } else
                     global.db.data.chats[m.chat] = {
+                        self: false, 
                         antispam: false,
                         antilink: false,
                         antivirtex: false,
@@ -107,14 +129,16 @@ export async function handler(chatUpdate) {
             let setting = global.db.data.settings[decodedBotLid];
             if (typeof setting !== "object") global.db.data.settings[decodedBotLid] = {};
             if (setting) {
-                if (!("chatMode" in setting)) setting.chatMode = "";
+                if (!('self' in setting)) setting.self = false 
+                if (!("chatMode" in setting)) setting.chatMode = ""; 
                 if (!("antispam" in setting)) setting.antispam = true;
                 if (!("autoread" in setting)) setting.autoread = true;
                 if (!("autobackup" in setting)) setting.autobackup = true;
                 if (!isNumber(setting.backupDate)) setting.backupDate = -1;
             } else
                 global.db.data.settings[decodedBotLid] = {
-                    chatMode: "",
+                    self: false, 
+                    chatMode: "", 
                     antispam: true,
                     autoread: true,
                     autobackup: true,
@@ -123,12 +147,15 @@ export async function handler(chatUpdate) {
         } catch (error) {
             console.log(error);
         }
-
+        
+        if (!m.fromMe && opts['self'])
+            return
+            
         if (typeof m.text !== "string") m.text = "";
+        
         const decodedOwnLid = await Promise.all(global.owner.map(o => conn.getLidPN(`${o.replace(/[^0-9]/g, "")}@s.whatsapp.net`)));
-        const isROwner = ([...decodedOwnLid] || decodedBotLid).includes(m.sender);
-
-        const isOwner = isROwner || m.fromMe || false;
+        const isROwner = ([...decodedOwnLid] || decodedBotLid).includes(m.sender) || conn.isOwner(m.sender, global.owner.map(o => o.replace(/[^0-9]/g, "")));
+        const isOwner = isROwner || m.fromMe || false; 
 
         let usedPrefix;
         const groupMetadata = (m.isGroup ? (conn.chats[m.chat] || {}).metadata || (await this.groupMetadata(m.chat).catch(_ => null)) : {}) || {};
@@ -342,6 +369,8 @@ export async function handler(chatUpdate) {
  * @param {import('baileys').BaileysEventMap<unknown>['group-participants.update']} groupsUpdate
  */
 export async function participantsUpdate({ id, participants, action }) {
+	if (opts['self'])
+		return    
     try {
         if (this.isHandlerInit) return;
         let chat = global.db.data?.chats[id] || {};
@@ -373,7 +402,6 @@ export async function participantsUpdate({ id, participants, action }) {
                                 : chat.sBye || conn.sBye || "Selamat Tinggal @user"
                         ).replace("@user", "@" + lid.split("@")[0]);
 
-                        // Opsional diatur sesuai keinginan
                         try {
                             await this.sendMessage(
                                 id,
@@ -439,6 +467,8 @@ export async function participantsUpdate({ id, participants, action }) {
  * @param {import('baileys').BaileysEventMap<unknown>['groups.update']} groupsUpdate
  */
 export async function groupsUpdate(groupsUpdate) {
+	if (opts['self'])
+		return
     try {
         if (!groupsUpdate) return;
         for (const groupUpdate of groupsUpdate) {
