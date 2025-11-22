@@ -56,11 +56,9 @@ export async function headerLog() {
         console.log(` ➢ 📂  ${chalk.red("MAGICK")}: ${magickStatus}`);
         if (!ffmpegCheck || !magickCheck) {
             console.log(chalk.gray("-".repeat(50)));
-            if (!s.ffmpeg) console.log(chalk.yellow("-- ffmpeg belum terinstall (pkg install ffmpeg)"));
-            if (s.ffmpeg && !s.ffmpegWebp)
-                console.log(chalk.yellow("-- ffmpeg belum mendukung webp (--enable-libwebp)"));
-            if (!s.convert && !s.magick && !s.gm)
-                console.log(chalk.yellow("-- imagemagick belum terinstall (pkg install imagemagick)"));
+            if (!s.ffmpeg) console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow.bold("FFMPEG BELUM TERPASANG!")}`);
+            if (s.ffmpeg && !s.ffmpegWebp) console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow("FFMPEG TIDAK MENDUKUNG WEBP!")}`);
+            if (!s.convert && !s.magick && !s.gm) console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.yellow("IMAGEMAGICK BELUM TERPASANG!")}`);
         }
     });
     console.log(chalk.bold.white("━".repeat(50)));

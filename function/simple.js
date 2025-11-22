@@ -106,9 +106,7 @@ export function makeWASocket(connectionOptions, options = {}) {
                   const participants = chat.metadata?.participants;
                   if (!participants) continue;
                   const user = participants.find(p => p.phoneNumber === decoded);
-                  if (user?.id) {
-                     return (conn.storeLid[decoded] = jidNormalizedUser(user.id));
-                  }
+                  if (user?.id) return (conn.storeLid[user.phoneNumber] = jidNormalizedUser(user.id));
                }
             }
             return decoded;
