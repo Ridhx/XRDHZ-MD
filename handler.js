@@ -30,8 +30,21 @@ export async function handler(chatUpdate) {
             const jidMentions = [...new Set(m.msg.contextInfo.mentionedJid.map(jid => conn.getLid(jid)))];
             conn.storeMentions[m.id] = jidMentions;
         }
+        
+        if (conn.storeLid && Object.keys(conn.storeLid).length == 0) {
+          const data = await conn.groupFetchAllParticipating();
+          for (let group of Object.values(data)) {
+             if (!group) continue;
+             for (let p of group.participants) {
+               if (!p || !p.id || !p.phoneNumber) continue;
+               conn.storeLid[p.phoneNumber] = p.id;
+             }
+          }
+          console.log(`${chalk.white.bold(" [SISTEM]")} ${chalk.green.bold("FETCHING LID SUKSES!")}`);
+        }
+        
         if (m.isBaileys) return;
-        const decodedBotLid = jidNormalizedUser(conn?.user?.lid) || conn.getLid(jidNormalizedUser(conn?.user?.id)) || "";
+        const decodedBotLid = jidNormalizedUser(conn?.user?.lid);
         try {
             if (global.db.data == null) await global.loadDatabase();
             let user = global.db.data.users[m.sender];
@@ -328,7 +341,7 @@ export async function handler(chatUpdate) {
     } catch (error) {
         console.log(error);
     } finally {
-        if (global.autoRead || global.db.data.settings[decodedBotLid].autoread) await conn.readMessages([m.key]);
+        if (global.autoRead) await conn.readMessages([m.key]);
         try {
             await printMessages(m, this);
         } catch (e) {
